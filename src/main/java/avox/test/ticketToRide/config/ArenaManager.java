@@ -27,13 +27,10 @@ public class ArenaManager {
     }
 
     public static World loadArena(String mapName, String instanceId) {
-
-
-
-        File source = new File(TicketToRide.plugin.getDataFolder(), "arena/" + mapName + "/world");
+        File source = new File(TicketToRide.plugin.getDataFolder(), "arenas/" + mapName + "/world");
         File target = new File(Bukkit.getWorldContainer(), instanceId);
 
-        copyWorld(source.toPath(), target.toPath());
+        copyArenaWorld(source.toPath(), target.toPath());
 
         WorldCreator creator = new WorldCreator(instanceId);
         World world = Bukkit.createWorld(creator);

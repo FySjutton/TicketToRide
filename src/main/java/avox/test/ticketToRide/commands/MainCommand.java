@@ -1,5 +1,6 @@
 package avox.test.ticketToRide.commands;
 
+import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.config.ArenaManager;
 import avox.test.ticketToRide.config.MapManager;
 import avox.test.ticketToRide.game.Game;
@@ -58,7 +59,7 @@ public class MainCommand {
                                             }
 
                                             if (!GameManager.activePlayers.contains(sender)) {
-                                                boolean succeeded = GameManager.createGame(sender, map, arena);
+                                                boolean succeeded = GameManager.createGame(TicketToRide.plugin, sender, map, arena);
                                                 if (succeeded) {
                                                     sender.sendMessage("§aCreated new T2R with map §e" + map + " §aand arena §e" + arena + "§a!");
                                                 } else {

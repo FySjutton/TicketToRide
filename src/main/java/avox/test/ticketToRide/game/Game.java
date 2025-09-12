@@ -19,14 +19,15 @@ import java.util.Random;
 import static avox.test.ticketToRide.TicketToRide.playerStateManager;
 
 public class Game {
+    public GameMap gameMap;
+    public Arena arena;
+
     public boolean started = false;
-    public World world;
     public Player gameOwner;
     public ArrayList<Player> members = new ArrayList<>();
     public ArrayList<GamePlayer> players = new ArrayList<>();
     public ArrayList<Player> invites = new ArrayList<>();
 
-    public GameMap gameMap;
 
     private TextDisplay infoText;
     private int infoTextStep = 1; // 1: not enough players, 2: start info
@@ -34,17 +35,14 @@ public class Game {
     public Location topLeft; // The top left position of the playing board
     public int tilesX = 8;
 
-    public String mapInstance;
-
-    public Game(Player gameOwner, World world, GameMap gameMap, Location topLeft, String mapInstance) {
+    public Game(Player gameOwner, Arena arena, GameMap gameMap, Location topLeft) {
         this.gameOwner = gameOwner;
-        this.world = world;
+        this.arena = arena;
         this.topLeft = topLeft;
-        this.mapInstance = mapInstance;
         this.gameMap = gameMap;
         addPlayer(gameOwner);
 
-        infoText = new BillboardManager().spawnLine(world, new Location(world, 0, 100, -8.5), 0, Component.text("Not enough players to start!", NamedTextColor.RED), 2, -1, false, true);
+        infoText = new BillboardManager().spawnLine(arena.world, new Location(arena.world, 0, 100, -8.5), Component.text("Not enough players to start!", NamedTextColor.RED), 2, -1, false, true);
     }
 
     public void addPlayer(Player player) {
@@ -59,7 +57,7 @@ public class Game {
         player.setGameMode(GameMode.ADVENTURE);
 
         GameManager.activePlayers.add(player);
-        player.teleport(new Location(world, 0.5, 100.5, 0.5).addRotation(-180, 0));
+        player.teleport(arena.spawnPosition);
 
         if (infoTextStep == 1 && members.size() >= 2) {
             infoTextStep = 2;

@@ -2,6 +2,7 @@ package avox.test.ticketToRide.game;
 
 import org.bukkit.Material;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,8 @@ import java.util.Map;
 public class GameMap {
     public String name;
     public String version;
+
+    public File map;
 
     public ArrayList<City> cities = new ArrayList<>();
     public ArrayList<Color> colors = new ArrayList<>();
@@ -21,8 +24,9 @@ public class GameMap {
     public int tilesX;
     public int tilesY;
 
-    public GameMap(String name, String version, int height, int width, int tilesX, int tilesY) {
+    public GameMap(String name, File map, String version, int height, int width, int tilesX, int tilesY) {
         this.name = name;
+        this.map = map;
         this.version = version;
         this.height = height;
         this.width = width;

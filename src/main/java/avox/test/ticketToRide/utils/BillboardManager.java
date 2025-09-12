@@ -1,6 +1,7 @@
 package avox.test.ticketToRide.utils;
 
 import avox.test.ticketToRide.TicketToRide;
+import avox.test.ticketToRide.game.Arena;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.text.Component;
@@ -19,13 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BillboardManager {
-    private final List<TextDisplay> lines = new ArrayList<>();
-    private Location center;
-
-    public void summonBillboards(World world) {
-        JsonObject mapData = TicketToRide.loadJson("/maps/templates/testMap/data.json");
-
-        spawnBillboardSection(world, mapData.getAsJsonArray("billboards").get(0).getAsJsonArray(),
+    public void summonBillboards(Arena arena) {
+        spawnBillboardSection(arena.world, arena.billboards.get(0),
                 "Goal", List.of(
                         "Each player starts with 45 trains.",
                         "You play on an interactive map.",
@@ -39,7 +35,7 @@ public class BillboardManager {
                 )
         );
 
-        spawnBillboardSection(world, mapData.getAsJsonArray("billboards").get(1).getAsJsonArray(),
+        spawnBillboardSection(arena.world, arena.billboards.get(1),
                 "Your Turn", List.of(
                         "On your turn, choose one action:",
                         "1) Take two train cards from the card inventory.",
@@ -51,7 +47,7 @@ public class BillboardManager {
                 )
         );
 
-        spawnBillboardSection(world, mapData.getAsJsonArray("billboards").get(2).getAsJsonArray(),
+        spawnBillboardSection(arena.world, arena.billboards.get(2),
                 "Routes & Tickets", List.of(
                         "Routes have lengths from 1 to 6 segments.",
                         "Longer routes are worth more points.",
@@ -63,7 +59,7 @@ public class BillboardManager {
                 )
         );
 
-        spawnBillboardSection(world, mapData.getAsJsonArray("billboards").get(3).getAsJsonArray(),
+        spawnBillboardSection(arena.world, arena.billboards.get(3),
                 "End & Scoring", List.of(
                         "The game ends when a player",
                         "has 2 or fewer trains left.",
@@ -75,28 +71,21 @@ public class BillboardManager {
         );
     }
 
-    private void spawnBillboardSection(World world, JsonArray location, String heading, List<String> lines) {
-        Location center = new Location(world,
-                location.get(0).getAsFloat(),
-                location.get(1).getAsFloat(),
-                location.get(2).getAsFloat());
-        int yaw = location.get(3).getAsInt();
-
-        spawnLine(world, center.clone().add(0, 0, 0), yaw,
+    private void spawnBillboardSection(World world, Location location, String heading, List<String> lines) {
+        spawnLine(world, location,
                 Component.text(heading)
                         .decorate(TextDecoration.BOLD)
                         .decorate(TextDecoration.UNDERLINED),
                 2.0f, -1, true, false);
 
         String bodyText = String.join("\n", lines);
-        spawnLine(world, center, yaw, Component.text(bodyText), 1.0f, lines.size(), true, false);
+        spawnLine(world, location, Component.text(bodyText), 1.0f, lines.size(), true, false);
     }
 
-    public TextDisplay spawnLine(World world, Location loc, int yaw, Component text, float scale, int lines, boolean fixed, boolean background) {
+    public TextDisplay spawnLine(World world, Location loc, Component text, float scale, int lines, boolean fixed, boolean background) {
         return world.spawn(loc, TextDisplay.class, display -> {
             if (fixed) {
                 display.setBillboard(Display.Billboard.FIXED);
-                display.setRotation(yaw, 0f);
             } else {
                 display.setBillboard(Display.Billboard.CENTER);
             }

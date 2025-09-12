@@ -15,7 +15,7 @@ public class ConfigManager {
     private File arenasFolder;
 
     public void setupConfig(JavaPlugin plugin) {
-        plugin.saveDefaultConfig();
+//        plugin.saveDefaultConfig();
 
         mapsFolder = new File(plugin.getDataFolder(), "maps");
         arenasFolder = new File(plugin.getDataFolder(), "arenas");

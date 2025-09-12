@@ -1,5 +1,7 @@
 package avox.test.ticketToRide.game;
 
+import avox.test.ticketToRide.config.ArenaManager;
+import avox.test.ticketToRide.config.FileConverter;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.renderer.MapSummoner;
 import avox.test.ticketToRide.utils.BillboardManager;
@@ -12,7 +14,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -24,28 +28,26 @@ public class GameManager {
     public static ArrayList<Player> activePlayers = new ArrayList<>();
     public static ArrayList<Game> activeGames = new ArrayList<>();
 
-    public static boolean createGame(Player gameOwner, String map, String arena) {
-        MapManager.loadMap()
+    public static boolean createGame(JavaPlugin plugin, Player gameOwner, String map, String arena) {
+        try {
+            GameMap gameMap = FileConverter.convertFileToMap(new File(plugin.getDataFolder() + "/maps", map));
+            Arena gameArena = FileConverter.convertFileToArena(arena, new File(plugin.getDataFolder() + "/arenas", arena));
+            if (gameMap == null || gameArena == null) {
+                return false;
+            }
 
-
-
-
-
-
-
-
-
-        String instanceId = "game_" + UUID.randomUUID();
-        World gameWorld;
-        gameWorld = MapManager.loadMap("testMap", instanceId);
-
-        Location base = new Location(gameWorld, -4, 98, -12);
-        new MapSummoner().generateAndDisplay(gameWorld, base);
+            new MapSummoner().generateAndDisplay(gameArena.world, gameMap.map, gameArena.mapStartPosition, gameMap.tilesX, gameMap.tilesY);
 //        new TrainRenderer().spawnSmallTrainCar(gameWorld, base);
 
-        new BillboardManager().summonBillboards(gameWorld);
+            new BillboardManager().summonBillboards(gameArena);
 
-        activeGames.add(new Game(gameOwner, gameWorld, base, instanceId));
+            activeGames.add(new Game(gameOwner, gameArena, gameMap, gameArena.mapStartPosition));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     public static void startGame(Game game) {
@@ -58,7 +60,7 @@ public class GameManager {
             player.player.getInventory().setChestplate(setLeatherColor(new ItemStack(Material.LEATHER_CHESTPLATE), player.markerData.getLeft()));
             player.player.getInventory().setHelmet(setLeatherColor(new ItemStack(Material.LEATHER_HELMET), player.markerData.getLeft()));
 
-            player.marker = markerManager.spawnMarker(game.world, game.topLeft, player.markerData.getRight());
+            player.marker = markerManager.spawnMarker(game.arena.world, game.topLeft, player.markerData.getRight());
             player.points = 0;
             markerManager.reposition(game, player, player.points);
         }
@@ -66,11 +68,11 @@ public class GameManager {
 
     public static void deleteGame(Game game) {
         activeGames.remove(game);
-        for (Player player : game.world.getPlayers()) {
+        for (Player player : game.arena.world.getPlayers()) {
             activePlayers.remove(player);
             playerStateManager.restorePlayer(player);
         }
-        MapManager.unloadAndDeleteMap(game.mapInstance);
+        ArenaManager.unloadAndDeleteArenaWorld(game.arena.mapID);
     }
 
     public static void changeOwner(Game game, Player newOwner) {

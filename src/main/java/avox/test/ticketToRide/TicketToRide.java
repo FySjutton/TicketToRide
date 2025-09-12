@@ -2,6 +2,7 @@ package avox.test.ticketToRide;
 
 import avox.test.ticketToRide.commands.MainCommand;
 import avox.test.ticketToRide.commands.TestCommand;
+import avox.test.ticketToRide.config.ArenaManager;
 import avox.test.ticketToRide.config.ConfigManager;
 import avox.test.ticketToRide.listener.ClickListener;
 import avox.test.ticketToRide.listener.GameRestrictionListener;
@@ -37,7 +38,7 @@ public final class TicketToRide extends JavaPlugin {
         ConfigManager configManager = new ConfigManager();
         configManager.setupConfig(plugin);
 
-        MapManager.cleanOldMaps();
+        ArenaManager.cleanOldArenaWorlds();
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> new MainCommand().register(commands.registrar()));
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> new TestCommand().register(commands.registrar()));
 
