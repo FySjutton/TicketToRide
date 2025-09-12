@@ -26,9 +26,7 @@ public class Game {
     public ArrayList<GamePlayer> players = new ArrayList<>();
     public ArrayList<Player> invites = new ArrayList<>();
 
-    public ArrayList<Track> tracks = new ArrayList<>();
-    public ArrayList<City> cities;
-    public ArrayList<DestinationCard> destinationCards;
+    public GameMap gameMap;
 
     private TextDisplay infoText;
     private int infoTextStep = 1; // 1: not enough players, 2: start info
@@ -38,11 +36,12 @@ public class Game {
 
     public String mapInstance;
 
-    public Game(Player gameOwner, World world, Location topLeft, String mapInstance) {
+    public Game(Player gameOwner, World world, GameMap gameMap, Location topLeft, String mapInstance) {
         this.gameOwner = gameOwner;
         this.world = world;
         this.topLeft = topLeft;
         this.mapInstance = mapInstance;
+        this.gameMap = gameMap;
         addPlayer(gameOwner);
 
         infoText = new BillboardManager().spawnLine(world, new Location(world, 0, 100, -8.5), 0, Component.text("Not enough players to start!", NamedTextColor.RED), 2, -1, false, true);

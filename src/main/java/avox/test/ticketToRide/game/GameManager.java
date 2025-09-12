@@ -1,9 +1,9 @@
 package avox.test.ticketToRide.game;
 
 import avox.test.ticketToRide.game.player.GamePlayer;
-import avox.test.ticketToRide.renderer.TicketMapRenderer;
+import avox.test.ticketToRide.renderer.MapSummoner;
 import avox.test.ticketToRide.utils.BillboardManager;
-import avox.test.ticketToRide.utils.MapManager;
+import avox.test.ticketToRide.config.MapManager;
 import avox.test.ticketToRide.utils.board.MarkerManager;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -24,13 +24,23 @@ public class GameManager {
     public static ArrayList<Player> activePlayers = new ArrayList<>();
     public static ArrayList<Game> activeGames = new ArrayList<>();
 
-    public static void createGame(Player gameOwner) {
+    public static boolean createGame(Player gameOwner, String map, String arena) {
+        MapManager.loadMap()
+
+
+
+
+
+
+
+
+
         String instanceId = "game_" + UUID.randomUUID();
         World gameWorld;
         gameWorld = MapManager.loadMap("testMap", instanceId);
 
         Location base = new Location(gameWorld, -4, 98, -12);
-        new TicketMapRenderer().generateAndDisplay(gameWorld, base);
+        new MapSummoner().generateAndDisplay(gameWorld, base);
 //        new TrainRenderer().spawnSmallTrainCar(gameWorld, base);
 
         new BillboardManager().summonBillboards(gameWorld);

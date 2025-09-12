@@ -2,20 +2,18 @@ package avox.test.ticketToRide;
 
 import avox.test.ticketToRide.commands.MainCommand;
 import avox.test.ticketToRide.commands.TestCommand;
+import avox.test.ticketToRide.config.ConfigManager;
 import avox.test.ticketToRide.listener.ClickListener;
 import avox.test.ticketToRide.listener.GameRestrictionListener;
 import avox.test.ticketToRide.listener.PlayerHandlerListener;
-import avox.test.ticketToRide.utils.MapManager;
+import avox.test.ticketToRide.config.MapManager;
 import avox.test.ticketToRide.utils.PlayerStateManager;
-import avox.test.ticketToRide.utils.ResourceExtractor;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -28,14 +26,17 @@ public final class TicketToRide extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         playerStateManager = new PlayerStateManager(getDataFolder());
-        try {
-            File templatesFolder = new File(getDataFolder(), "maps/templates");
-            if (!templatesFolder.exists()) {
-                new ResourceExtractor(this).extractTemplates();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            File templatesFolder = new File(getDataFolder(), "maps/templates");
+//            if (!templatesFolder.exists()) {
+//                new ResourceExtractor(this).extractTemplates();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        ConfigManager configManager = new ConfigManager();
+        configManager.setupConfig(plugin);
+
         MapManager.cleanOldMaps();
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> new MainCommand().register(commands.registrar()));
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> new TestCommand().register(commands.registrar()));

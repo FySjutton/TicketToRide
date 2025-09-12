@@ -1,5 +1,7 @@
 package avox.test.ticketToRide.commands;
 
+import avox.test.ticketToRide.config.ArenaManager;
+import avox.test.ticketToRide.config.MapManager;
 import avox.test.ticketToRide.game.Game;
 import avox.test.ticketToRide.game.GameManager;
 import avox.test.ticketToRide.game.player.GamePlayer;
@@ -26,18 +28,51 @@ public class MainCommand {
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("t2r")
                 .then(Commands.literal("create")
-                        .executes(ctx -> {
-                            if (!(ctx.getSource().getExecutor() instanceof Player)) return 0;
-                            Player sender = (Player) ctx.getSource().getSender();
-                            if (!GameManager.activePlayers.contains(sender)) {
-                                GameManager.createGame(sender);
-                                sender.sendMessage("§aA new T2R has successfully been created!");
-                                return 1;
-                            } else {
-                                sender.sendMessage("§cYou are already in a game!");
-                                return 0;
-                            }
-                        }))
+                        .then(Commands.argument("map", StringArgumentType.word())
+                                .suggests((ctx, builder) -> {
+                                    for (String map : MapManager.mapNames) {
+                                        if (map.toLowerCase().startsWith(builder.getRemainingLowerCase())) {
+                                            builder.suggest(map);
+                                        }
+                                    }
+                                    return builder.buildFuture();
+                                })
+                                .then(Commands.argument("arena", StringArgumentType.word())
+                                        .suggests((ctx, builder) -> {
+                                            for (String arena : ArenaManager.arenaNames) {
+                                                if (arena.toLowerCase().startsWith(builder.getRemainingLowerCase())) {
+                                                    builder.suggest(arena);
+                                                }
+                                            }
+                                            return builder.buildFuture();
+                                        })
+                                        .executes(ctx -> {
+                                            if (!(ctx.getSource().getExecutor() instanceof Player)) return 0;
+                                            Player sender = (Player) ctx.getSource().getSender();
+                                            String map = StringArgumentType.getString(ctx, "map");
+                                            String arena = StringArgumentType.getString(ctx, "arena");
+
+                                            if (!(MapManager.mapNames.contains(map) && ArenaManager.arenaNames.contains(arena))) {
+                                                sender.sendMessage("§cThis is not a valid map or arena!");
+                                                return 0;
+                                            }
+
+                                            if (!GameManager.activePlayers.contains(sender)) {
+                                                boolean succeeded = GameManager.createGame(sender, map, arena);
+                                                if (succeeded) {
+                                                    sender.sendMessage("§aCreated new T2R with map §e" + map + " §aand arena §e" + arena + "§a!");
+                                                } else {
+                                                    sender.sendMessage("§cFailed to start game!");
+                                                }
+                                                return 1;
+                                            } else {
+                                                sender.sendMessage("§cYou are already in a game!");
+                                                return 0;
+                                            }
+                                        })
+                                )
+                        )
+                )
                 .then(Commands.literal("start")
                         .executes(ctx -> {
                             Player sender = (Player) ctx.getSource().getSender();
