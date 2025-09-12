@@ -1,0 +1,4 @@
+name: TicketToRide
+version: '1.0-SNAPSHOT'
+main: avox.test.ticketToRide.TicketToRide
+api-version: '1.21'
