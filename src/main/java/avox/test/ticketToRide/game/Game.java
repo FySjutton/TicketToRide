@@ -28,21 +28,16 @@ public class Game {
     public ArrayList<GamePlayer> players = new ArrayList<>();
     public ArrayList<Player> invites = new ArrayList<>();
 
-
     private TextDisplay infoText;
     private int infoTextStep = 1; // 1: not enough players, 2: start info
 
-    public Location topLeft; // The top left position of the playing board
-    public int tilesX = 8;
-
-    public Game(Player gameOwner, Arena arena, GameMap gameMap, Location topLeft) {
+    public Game(Player gameOwner, Arena arena, GameMap gameMap) {
         this.gameOwner = gameOwner;
         this.arena = arena;
-        this.topLeft = topLeft;
         this.gameMap = gameMap;
         addPlayer(gameOwner);
 
-        infoText = new BillboardManager().spawnLine(arena.world, new Location(arena.world, 0, 100, -8.5), Component.text("Not enough players to start!", NamedTextColor.RED), 2, -1, false, true);
+        infoText = new BillboardManager().spawnLine(arena.world, arena.mapStartPosition.clone().add((double) arena.tileX / 2, 2, (double) arena.tileY / 2), Component.text("Not enough players to start!", NamedTextColor.RED), 2, -1, false, true);
     }
 
     public void addPlayer(Player player) {

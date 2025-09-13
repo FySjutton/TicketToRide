@@ -1,30 +1,28 @@
 package avox.test.ticketToRide.listener;
 
+import avox.test.ticketToRide.game.Game;
+import avox.test.ticketToRide.game.GameMap;
+import avox.test.ticketToRide.game.Route;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.*;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import static avox.test.ticketToRide.game.GameManager.activePlayers;
+import static avox.test.ticketToRide.game.GameManager.getGameByUser;
 
 public class ClickListener implements Listener {
-    private final Location baseLocation;
-    private final int gridSize = 8;
-    private final int tilePixels = 128;
-    private final double tileSize = 1.0;
-
-    public ClickListener(Location baseLocation) {
-        this.baseLocation = baseLocation;
-    }
-
     @EventHandler
     public void itemFrameChanged(PlayerItemFrameChangeEvent event) {
         if (activePlayers.contains(event.getPlayer())) {
@@ -36,8 +34,11 @@ public class ClickListener implements Listener {
     public void entityAttack(PrePlayerAttackEntityEvent event) {
         if (activePlayers.contains(event.getPlayer())) {
             event.setCancelled(true);
-            if (event.getAttacked() instanceof ItemFrame frame) {
-                sendPixelCoords(event.getPlayer(), frame.getLocation().toVector());
+            if (event.getAttacked() instanceof ItemFrame) {
+                Game game = getGameByUser(event.getPlayer());
+                if (game == null) return;
+
+                raytraceClick(event.getPlayer(), game);
             }
         }
     }
@@ -72,39 +73,47 @@ public class ClickListener implements Listener {
         if (!event.getAction().toString().contains("LEFT_CLICK")) return;
 
         Player player = event.getPlayer();
+        Game game = getGameByUser(player);
+        if (game == null) return;
 
-        RayTraceResult result = player.getWorld().rayTrace(
+        raytraceClick(player, game);
+    }
+
+    private void raytraceClick(Player player, Game game) {
+        RayTraceResult result = player.getWorld().rayTraceBlocks(
                 player.getEyeLocation(),
                 player.getEyeLocation().getDirection(),
                 20,
                 FluidCollisionMode.NEVER,
-                true,
-                0.1,
-                entity -> false
+                true
         );
 
-        if (result == null || result.getHitPosition() == null) return;
+        if (result == null) return;
+        result.getHitPosition();
         Vector hit = result.getHitPosition();
 
-        double relX = hit.getX() - baseLocation.getX();
-        double relZ = hit.getZ() - baseLocation.getZ();
-
-        if (relX < 0 || relZ < 0 || relX > gridSize * tileSize || relZ > gridSize * tileSize) return;
-
-        sendPixelCoords(player, hit);
+        checkTile(player, hit, game);
     }
 
-    private void sendPixelCoords(Player player, Vector hit) {
-        double relX = hit.getX() - baseLocation.getX();
-        double relZ = hit.getZ() - baseLocation.getZ();
+    private void checkTile(Player player, Vector hit, Game game) {
+        Location baseLocation = game.gameMap.getStartLocation(game.arena);
 
-        int pixelX = (int) ((relX / (gridSize * tileSize)) * (tilePixels * gridSize));
-        int pixelY = (int) ((relZ / (gridSize * tileSize)) * (tilePixels * gridSize));
+        double pixelX = (hit.getX() - baseLocation.getX()) * 128;
+        double pixelY = (hit.getZ() - baseLocation.getZ()) * 128;
 
-        int tileX = pixelX / tilePixels;
-        int tileY = pixelY / tilePixels;
+        if (pixelX < 0 || pixelY < 0 || pixelX > game.gameMap.width || pixelY > game.gameMap.height) return;
+        for (Route route : game.gameMap.routes) {
+            for (Route.Tile tile : route.tiles) {
+                if (tile.x < pixelX && tile.y < pixelY && tile.x + tile.widthBounding > pixelX && tile.y + tile.heightBounding > pixelY) {
+                    int relativeX = (int) (pixelX - tile.x);
+                    int relativeY = (int) (pixelY - tile.y);
 
-        player.sendMessage(ChatColor.GREEN + "Klickade på pixel (" + pixelX + ", " + pixelY +
-                ") på tile (" + tileX + ", " + tileY + ")");
+                    boolean hitTile = game.gameMap.tileMaps.get(tile.rotation).hit(relativeX, relativeY);
+                    if (hitTile) {
+                        player.sendMessage("§dClicked tile!");
+                    }
+                }
+            }
+        }
     }
 }

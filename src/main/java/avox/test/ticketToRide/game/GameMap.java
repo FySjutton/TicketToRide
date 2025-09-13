@@ -1,5 +1,6 @@
 package avox.test.ticketToRide.game;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.io.File;
@@ -17,6 +18,7 @@ public class GameMap {
     public ArrayList<Color> colors = new ArrayList<>();
     public ArrayList<Route> routes = new ArrayList<>();
     public HashMap<Integer, TileMap> tileMaps = new HashMap<>();
+    public HashMap<Integer, PointSquare> pointBoard = new HashMap<>();
 
     public int height;
     public int width;
@@ -24,7 +26,9 @@ public class GameMap {
     public int tilesX;
     public int tilesY;
 
-    public GameMap(String name, File map, String version, int height, int width, int tilesX, int tilesY) {
+    public int pointBoardSize;
+
+    public GameMap(String name, File map, String version, int height, int width, int tilesX, int tilesY, int pointBoardSize) {
         this.name = name;
         this.map = map;
         this.version = version;
@@ -32,6 +36,7 @@ public class GameMap {
         this.width = width;
         this.tilesX = tilesX;
         this.tilesY = tilesY;
+        this.pointBoardSize = pointBoardSize;
     }
 
     public City getCity(String name) {
@@ -42,10 +47,21 @@ public class GameMap {
         return colors.stream().filter(color -> color.color.equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
+    public Location getStartLocation(Arena arena) {
+        return arena.mapStartPosition.clone().add((double) ((tilesX * 128 - width) / 2) / 128, 0, (double) ((tilesY * 128 -height) / 2) / 128);
+    }
+
     public record Color(String color, Material material) {}
 
     public static class TileMap {
         public ArrayList<LineMap> lines = new ArrayList<>();
+        public int centerX;
+        public int centerY;
+
+        public TileMap(int centerX, int centerY) {
+            this.centerX = centerX;
+            this.centerY = centerY;
+        }
 
         public static class LineMap {
             public int start;
@@ -55,6 +71,26 @@ public class GameMap {
                 this.start = start;
                 this.length = length;
             }
+        }
+
+        public boolean hit(int x, int y) {
+            LineMap lineMap = lines.get(y);
+            if (lineMap.start == -1) return false;
+            return lineMap.start <= x && x <= lineMap.start + lineMap.length;
+        }
+    }
+
+    public static class PointSquare {
+        public int x;
+        public int y;
+        public int width;
+        public int height;
+
+        public PointSquare(int x, int y, int width, int height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
         }
     }
 }

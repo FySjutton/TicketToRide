@@ -20,6 +20,9 @@ public class Route {
 
     public static class Tile {
         public int rotation;
+        public int widthBounding;
+        public int heightBounding;
+
         public int width;
         public int height;
 
@@ -28,8 +31,12 @@ public class Route {
 
         public TileType type;
 
-        public Tile(int rotation, int width, int height, int x, int y, TileType type) {
+        public Tile(int rotation, int widthBounding, int heightBounding, int width, int height, int x, int y, TileType type) {
             this.rotation = rotation;
+
+            this.widthBounding = widthBounding;
+            this.heightBounding = heightBounding;
+
             this.width = width;
             this.height = height;
             this.x = x;

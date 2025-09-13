@@ -4,6 +4,7 @@ import avox.test.ticketToRide.config.ArenaManager;
 import avox.test.ticketToRide.config.FileConverter;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.renderer.MapSummoner;
+import avox.test.ticketToRide.renderer.TrainRenderer;
 import avox.test.ticketToRide.utils.BillboardManager;
 import avox.test.ticketToRide.config.MapManager;
 import avox.test.ticketToRide.utils.board.MarkerManager;
@@ -41,7 +42,16 @@ public class GameManager {
 
             new BillboardManager().summonBillboards(gameArena);
 
-            activeGames.add(new Game(gameOwner, gameArena, gameMap, gameArena.mapStartPosition));
+
+            // Testing
+            TrainRenderer renderer = new TrainRenderer();
+            for (Route route : gameMap.routes) {
+                for (Route.Tile tile : route.tiles) {
+                    renderer.spawnSmallTrainCar(gameArena, gameMap, tile);
+                }
+            }
+
+            activeGames.add(new Game(gameOwner, gameArena, gameMap));
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,7 +70,7 @@ public class GameManager {
             player.player.getInventory().setChestplate(setLeatherColor(new ItemStack(Material.LEATHER_CHESTPLATE), player.markerData.getLeft()));
             player.player.getInventory().setHelmet(setLeatherColor(new ItemStack(Material.LEATHER_HELMET), player.markerData.getLeft()));
 
-            player.marker = markerManager.spawnMarker(game.arena.world, game.topLeft, player.markerData.getRight());
+            player.marker = markerManager.spawnMarker(game, player.markerData.getRight());
             player.points = 0;
             markerManager.reposition(game, player, player.points);
         }

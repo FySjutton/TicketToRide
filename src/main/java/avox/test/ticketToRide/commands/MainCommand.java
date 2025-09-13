@@ -91,7 +91,7 @@ public class MainCommand {
                                 if (activePlayers.contains(sender)) {
                                     sender.sendMessage("§cYou do not have permission to do this! Ask the game host to execute this command!");
                                 } else {
-                                    sender.sendMessage("§c&You are not in a game! Create one first!");
+                                    sender.sendMessage("§cYou are not in a game! Create one first!");
                                 }
                             }
                             return 0;

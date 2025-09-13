@@ -34,17 +34,9 @@ public class TestCommand {
                                 Game game = getGameByUser(sender);
                                 GamePlayer player = game.players.stream().filter(p -> p.player == sender).toList().getFirst();
                                 player.points += IntegerArgumentType.getInteger(ctx, "amount");
+                                new MarkerManager().reposition(game, player, player.points);
                                 return 1;
                             })))
-                .then(Commands.literal("refresh")
-                    .executes(ctx -> {
-                        Player sender = (Player) ctx.getSource().getSender();
-                        Game game = getGameByUser(sender);
-                        GamePlayer player = game.players.stream().filter(p -> p.player == sender).toList().getFirst();
-
-                        new MarkerManager().reposition(game, player, player.points);
-                        return 1;
-                    }))
                 .build();
     }
 

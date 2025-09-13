@@ -42,7 +42,7 @@ public final class TicketToRide extends JavaPlugin {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> new MainCommand().register(commands.registrar()));
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> new TestCommand().register(commands.registrar()));
 
-        getServer().getPluginManager().registerEvents(new ClickListener(new Location(null, -4, 99, -12)), this);
+        getServer().getPluginManager().registerEvents(new ClickListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerHandlerListener(plugin), this);
         getServer().getPluginManager().registerEvents(new GameRestrictionListener(), this);
     }

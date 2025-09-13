@@ -1,6 +1,7 @@
 package avox.test.ticketToRide.utils.board;
 
 import avox.test.ticketToRide.game.Game;
+import avox.test.ticketToRide.game.GameMap;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,49 +9,42 @@ import org.bukkit.World;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class MarkerManager {
-    public BlockDisplay spawnMarker(World world, Location loc, Material material) {
-        BlockDisplay blockDisplay = (BlockDisplay) world.spawnEntity(loc, EntityType.BLOCK_DISPLAY);
-        blockDisplay.setBlock(material.createBlockData());
-        blockDisplay.setTransformation(new Transformation(
+    public ItemDisplay spawnMarker(Game game, Material material) {
+        ItemDisplay itemDisplay = (ItemDisplay) game.arena.world.spawnEntity(game.arena.mapStartPosition, EntityType.ITEM_DISPLAY);
+        itemDisplay.setItemStack(new ItemStack(material));
+        itemDisplay.setTransformation(new Transformation(
                 new Vector3f(0f, 0f, 0f),
                 new Quaternionf(),
                 new Vector3f(0.2f, 0.06f, 0.2f),
                 new Quaternionf()
         ));
-        blockDisplay.setBillboard(Display.Billboard.FIXED);
-        blockDisplay.setViewRange(64);
-        blockDisplay.setPersistent(true);
-        blockDisplay.setBrightness(new Display.Brightness(15, 15));
-        return blockDisplay;
+        itemDisplay.setBillboard(Display.Billboard.FIXED);
+        itemDisplay.setViewRange(64);
+        itemDisplay.setPersistent(true);
+        itemDisplay.setBrightness(new Display.Brightness(15, 15));
+        return itemDisplay;
     }
 
     public void reposition(Game game, GamePlayer player, int points) {
-        BlockDisplay marker = player.marker;
-        int square = points % 100;
-        int stacked = Math.toIntExact(game.players.stream().filter(p -> p.points != -1 && p.player != player.player && p.points % 100 == square).count());
+        ItemDisplay marker = player.marker;
+        int square = getSquare(points % game.gameMap.pointBoardSize);
+        int stacked = Math.toIntExact(game.players.stream().filter(p -> p.points != -1 && p.player != player.player && getSquare(p.points % game.gameMap.pointBoardSize) == square).count());
 
-        int x;
-        int y;
-        if (square <= 25) {
-            x = game.tilesX * 128 - 18 - 19;
-            y = 18 + square * 38 + 19;
-        } else if (square <= 50) {
-            x = game.tilesX * 128 - 18 - (square - 25) * 38 - 19;
-            y = game.tilesX * 128 - 18 - 19;
-        } else if (square <= 75) {
-            x = 18 + 19;
-            y = game.tilesX * 128 - 18 - (square - 49) * 38 + 19;
-        } else {
-            x = 18 + (square - 75) * 38 + 19;
-            y = 18 + 19;
-        }
+        GameMap.PointSquare pointSquare = game.gameMap.pointBoard.get(square);
+        int x = pointSquare.x + pointSquare.width / 2;
+        int y = pointSquare.y + pointSquare.height / 2;
 
-        double offset = marker.getTransformation().getScale().x / 2;
-        marker.teleport(game.topLeft.clone().add((double) x / 128 - offset, marker.getTransformation().getScale().y * stacked, (double) y / 128 - offset));
+        marker.teleport(game.gameMap.getStartLocation(game.arena).add((double) x / 128, 0.0525f + marker.getTransformation().getScale().y * stacked, (double) y / 128));
+    }
+
+    private int getSquare(int square) {
+        return square == 0 ? 100 : square;
     }
 }

@@ -7,13 +7,14 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class GamePlayer {
     public Player player;
-    public BlockDisplay marker;
+    public ItemDisplay marker;
     public Pair<Color, Material> markerData;
 
 

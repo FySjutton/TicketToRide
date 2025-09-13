@@ -45,7 +45,7 @@ public class FileConverter {
     }
 
     private static GameMap generateMap(File mapImage, JsonObject data, JsonObject tileMapData) {
-        GameMap map = new GameMap(data.get("map").getAsString(), mapImage, data.get("version").getAsString(), data.get("size_x").getAsInt(), data.get("size_y").getAsInt(), data.get("map_x").getAsInt(), data.get("map_y").getAsInt());
+        GameMap map = new GameMap(data.get("map").getAsString(), mapImage, data.get("version").getAsString(), data.get("size_x").getAsInt(), data.get("size_y").getAsInt(), data.get("map_x").getAsInt(), data.get("map_y").getAsInt(), data.get("point_board_size").getAsInt());
 
         JsonObject colors = data.getAsJsonObject("colors");
         for (Map.Entry<String, JsonElement> color : colors.asMap().entrySet()) {
@@ -66,18 +66,29 @@ public class FileConverter {
             JsonArray tiles = routeData.getAsJsonArray("tiles");
             for (JsonElement jsonTile : tiles) {
                 JsonObject tileData = jsonTile.getAsJsonObject();
-                route.tiles.add(new Route.Tile(tileData.get("rotation").getAsInt(), tileData.get("width").getAsInt(), tileData.get("height").getAsInt(), tileData.get("x").getAsInt(), tileData.get("y").getAsInt(), Route.TileType.valueOf(tileData.get("type").getAsString().toUpperCase())));
+                route.tiles.add(new Route.Tile(tileData.get("rotation").getAsInt(), tileData.get("width").getAsInt(), tileData.get("height").getAsInt(), data.get("tile_x").getAsInt(), data.get("tile_y").getAsInt(), tileData.get("x").getAsInt(), tileData.get("y").getAsInt(), Route.TileType.valueOf(tileData.get("type").getAsString().toUpperCase())));
             }
 
             map.routes.add(route);
         }
 
+        JsonObject pointBoard = data.getAsJsonObject("point_board");
+        for (String key : pointBoard.keySet()) {
+            JsonObject pointBoardJson = pointBoard.getAsJsonObject(key);
+            map.pointBoard.put(Integer.parseInt(key), new GameMap.PointSquare(pointBoardJson.get("x").getAsInt(), pointBoardJson.get("y").getAsInt(), pointBoardJson.get("width").getAsInt(), pointBoardJson.get("height").getAsInt()));
+        }
+
         for (String tile : tileMapData.keySet()) {
-            GameMap.TileMap tileMap = new GameMap.TileMap();
-            JsonArray tileData = tileMapData.getAsJsonArray(tile);
+            JsonArray tileTopLeft = tileMapData.getAsJsonObject(tile).get("center").getAsJsonArray();
+            JsonArray tileData = tileMapData.getAsJsonObject(tile).get("rows").getAsJsonArray();
+            GameMap.TileMap tileMap = new GameMap.TileMap(tileTopLeft.get(0).getAsInt(), tileTopLeft.get(1).getAsInt());
             for (JsonElement tileRotation : tileData) {
-                JsonArray rotation = tileRotation.getAsJsonArray();
-                tileMap.lines.add(new GameMap.TileMap.LineMap(rotation.get(0).isJsonNull() ? -1 : rotation.get(0).getAsInt(), rotation.get(1).getAsInt()));
+                if (tileRotation.isJsonNull()) {
+                    tileMap.lines.add(new GameMap.TileMap.LineMap(-1, -1));
+                } else {
+                    JsonArray rotation = tileRotation.getAsJsonArray();
+                    tileMap.lines.add(new GameMap.TileMap.LineMap(rotation.get(0).isJsonNull() ? -1 : rotation.get(0).getAsInt(), rotation.get(1).getAsInt()));
+                }
             }
             map.tileMaps.put(Integer.parseInt(tile.split("_")[1]), tileMap);
         }
