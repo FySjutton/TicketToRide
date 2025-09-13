@@ -29,10 +29,11 @@ public class GameManager {
     public static ArrayList<Player> activePlayers = new ArrayList<>();
     public static ArrayList<Game> activeGames = new ArrayList<>();
 
-    public static boolean createGame(JavaPlugin plugin, Player gameOwner, String map, String arena) {
+    public static boolean createGame(JavaPlugin plugin, Player gameOwner, GameMap gameMap, ArenaBase arena) {
         try {
-            GameMap gameMap = FileConverter.convertFileToMap(new File(plugin.getDataFolder() + "/maps", map));
-            Arena gameArena = FileConverter.convertFileToArena(arena, new File(plugin.getDataFolder() + "/arenas", arena));
+//            GameMap gameMap = FileConverter.convertFileToMap(new File(plugin.getDataFolder() + "/maps", map));
+//            Arena gameArena = FileConverter.convertFileToArena(arena, new File(plugin.getDataFolder() + "/arenas", arena));
+            Arena gameArena = arena.initiateArena();
             if (gameMap == null || gameArena == null) {
                 return false;
             }

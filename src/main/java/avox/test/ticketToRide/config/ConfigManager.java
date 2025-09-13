@@ -7,24 +7,22 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 
-import static avox.test.ticketToRide.config.ArenaManager.loadArenaNames;
-import static avox.test.ticketToRide.config.MapManager.loadMapNames;
+import static avox.test.ticketToRide.config.ArenaManager.loadArenas;
+import static avox.test.ticketToRide.config.MapManager.loadMaps;
 
 public class ConfigManager {
-    private File mapsFolder;
-    private File arenasFolder;
 
     public void setupConfig(JavaPlugin plugin) {
 //        plugin.saveDefaultConfig();
 
-        mapsFolder = new File(plugin.getDataFolder(), "maps");
-        arenasFolder = new File(plugin.getDataFolder(), "arenas");
+        File mapsFolder = new File(plugin.getDataFolder(), "maps");
+        File arenasFolder = new File(plugin.getDataFolder(), "arenas");
 
         if (!mapsFolder.exists()) mapsFolder.mkdirs();
         if (!arenasFolder.exists()) arenasFolder.mkdirs();
 
-        loadMapNames(mapsFolder);
-        loadArenaNames(arenasFolder);
+        loadMaps(mapsFolder);
+        loadArenas(arenasFolder) ;
     }
 
     public FileConfiguration loadCustomConfig(File folder, String fileName) {

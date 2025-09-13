@@ -8,10 +8,12 @@ import avox.test.ticketToRide.listener.ClickListener;
 import avox.test.ticketToRide.listener.GameRestrictionListener;
 import avox.test.ticketToRide.listener.PlayerHandlerListener;
 import avox.test.ticketToRide.config.MapManager;
+import avox.test.ticketToRide.utils.PlayerGuiManager;
 import avox.test.ticketToRide.utils.PlayerStateManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,7 +23,9 @@ import java.nio.charset.StandardCharsets;
 
 public final class TicketToRide extends JavaPlugin {
     public static JavaPlugin plugin;
+
     public static PlayerStateManager playerStateManager;
+    private PlayerGuiManager guiManager;
 
     @Override
     public void onEnable() {
@@ -45,6 +49,9 @@ public final class TicketToRide extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ClickListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerHandlerListener(plugin), this);
         getServer().getPluginManager().registerEvents(new GameRestrictionListener(), this);
+
+        guiManager = new PlayerGuiManager();
+        getServer().getPluginManager().registerEvents(guiManager, this);
     }
 
     @Override

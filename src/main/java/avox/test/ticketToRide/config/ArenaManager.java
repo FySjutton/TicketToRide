@@ -1,27 +1,36 @@
 package avox.test.ticketToRide.config;
 
 import avox.test.ticketToRide.TicketToRide;
+import avox.test.ticketToRide.game.Arena;
+import avox.test.ticketToRide.game.ArenaBase;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.UUID;
 
 public class ArenaManager {
-    public static ArrayList<String> arenaNames = new ArrayList<>();
+    public static ArrayList<ArenaBase> arenas = new ArrayList<>();
 
-    public static void loadArenaNames(File arenaFolder) {
-        arenaNames.clear();
+    public static void loadArenas(File arenaFolder) {
+        arenas.clear();
         File[] folders = arenaFolder.listFiles(File::isDirectory);
         if (folders != null) {
             for (File folder : folders) {
-                arenaNames.add(folder.getName());
+                arenas.add(convertFileToArena(folder));
             }
         }
     }
@@ -29,6 +38,8 @@ public class ArenaManager {
     public static World loadArena(String mapName, String instanceId) {
         File source = new File(TicketToRide.plugin.getDataFolder(), "arenas/" + mapName + "/world");
         File target = new File(Bukkit.getWorldContainer(), instanceId);
+
+
 
         copyArenaWorld(source.toPath(), target.toPath());
 
@@ -97,5 +108,40 @@ public class ArenaManager {
                 deleteDirectory(file.toPath());
             }
         }
+    }
+
+    public static ArenaBase convertFileToArena(File folder) {
+        if (!folder.isDirectory()) {
+            throw new IllegalArgumentException("Expected folder, got file: " + folder.getPath());
+        }
+
+        File dataFile = new File(folder, "data.json");
+
+        if (!dataFile.exists()) {
+            throw new IllegalStateException("Folder is missing required files!");
+        }
+
+
+        try (FileReader dataReader = new FileReader(dataFile)) {
+            JsonObject dataJson = JsonParser.parseReader(dataReader).getAsJsonObject();
+            return loadArena(dataJson);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private static ArenaBase loadArena(JsonObject data) {
+        JsonArray spawn = data.get("spawn").getAsJsonArray();
+        JsonArray mapOrigin = data.get("map_origin").getAsJsonArray();
+
+        return new ArenaBase(
+            data.get("name").getAsString(),
+            new Location(null, spawn.get(0).getAsFloat(), spawn.get(1).getAsFloat(), spawn.get(2).getAsFloat(), spawn.get(3).getAsFloat(), spawn.get(4).getAsFloat()),
+            new Location(null, mapOrigin.get(0).getAsFloat(), mapOrigin.get(1).getAsFloat(), mapOrigin.get(2).getAsFloat()),
+            data.get("size_x").getAsInt(),
+            data.get("size_y").getAsInt()
+        );
     }
 }
