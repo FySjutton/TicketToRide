@@ -7,8 +7,11 @@ import org.bukkit.World;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class ArenaBase {
+public class BaseArena {
     public String name;
+    public String fileName;
+    public String description;
+    public String texture;
     public Location spawnPosition;
     public Location mapStartPosition;
 
@@ -17,8 +20,11 @@ public class ArenaBase {
 
     public ArrayList<Location> billboards = new ArrayList<>();
 
-    public ArenaBase(String name, Location spawnPosition, Location mapStartPosition, int tileX, int tileY) {
+    public BaseArena(String name, String fileName, String texture, String description, Location spawnPosition, Location mapStartPosition, int tileX, int tileY) {
         this.name = name;
+        this.fileName = fileName;
+        this.texture = texture;
+        this.description = description;
         this.spawnPosition = spawnPosition;
         this.mapStartPosition = mapStartPosition;
         this.tileX = tileX;
@@ -28,9 +34,16 @@ public class ArenaBase {
     public Arena initiateArena() {
         String instanceId = "t2r_game_" + UUID.randomUUID();
 
-        World world = ArenaManager.loadArena(name, instanceId);
+        World world = ArenaManager.loadArena(fileName, instanceId);
+
+        spawnPosition = spawnPosition.toLocation(world);
+        mapStartPosition = mapStartPosition.toLocation(world);
+
         Arena arena = new Arena(name, instanceId, world, spawnPosition, mapStartPosition, tileX, tileY);
-        arena.billboards = billboards;
+
+        for (Location billboard : billboards) {
+            arena.billboards.add(billboard.toLocation(world));
+        }
         return arena;
     }
 }

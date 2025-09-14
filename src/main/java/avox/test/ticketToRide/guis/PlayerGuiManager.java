@@ -1,7 +1,5 @@
-package avox.test.ticketToRide.utils;
+package avox.test.ticketToRide.guis;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,16 +7,17 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerGuiManager implements Listener {
     private static final Map<Player, Inventory> playerInventories = new HashMap<>();
+    private static final Map<Player, Map<Integer, Runnable>> playerClickActions = new HashMap<>();
 
-    public static void createGui(Inventory inventory, Player player) {
+    public static void createGui(Inventory inventory, Player player, Map<Integer, Runnable> slotActions) {
         playerInventories.put(player, inventory);
+        playerClickActions.put(player, slotActions);
     }
 
     @EventHandler
@@ -29,8 +28,11 @@ public class PlayerGuiManager implements Listener {
         if (gui != null && event.getInventory().equals(gui)) {
             event.setCancelled(true);
 
-            if (event.getSlot() == 4) {
-                player.sendMessage("Du klickade på diamanten!");
+            int slot = event.getSlot();
+            Map<Integer, Runnable> actions = playerClickActions.get(player);
+
+            if (actions != null && actions.containsKey(slot)) {
+                actions.get(slot).run();
             }
         }
     }
@@ -49,5 +51,6 @@ public class PlayerGuiManager implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
         playerInventories.remove(player);
+        playerClickActions.remove(player);
     }
 }

@@ -55,7 +55,18 @@ public class MapManager {
     }
 
     private static GameMap generateMap(File mapImage, JsonObject data, JsonObject tileMapData) {
-        GameMap map = new GameMap(data.get("map").getAsString(), mapImage, data.get("version").getAsString(), data.get("size_x").getAsInt(), data.get("size_y").getAsInt(), data.get("map_x").getAsInt(), data.get("map_y").getAsInt(), data.get("point_board_size").getAsInt());
+        GameMap map = new GameMap(
+            data.get("map").getAsString(),
+            data.get("description").getAsString(),
+            mapImage,
+            data.get("version").getAsString(),
+            data.get("size_x").getAsInt(),
+            data.get("size_y").getAsInt(),
+            data.get("map_x").getAsInt(),
+            data.get("map_y").getAsInt(),
+            data.get("point_board_size").getAsInt(),
+            data.get("head_texture").getAsString()
+        );
 
         JsonObject colors = data.getAsJsonObject("colors");
         for (Map.Entry<String, JsonElement> color : colors.asMap().entrySet()) {
@@ -65,7 +76,14 @@ public class MapManager {
         JsonObject cities = data.getAsJsonObject("cities");
         for (String city : cities.keySet()) {
             JsonObject cityJson = cities.getAsJsonObject(city);
-            map.cities.add(new City(city, cityJson.get("height").getAsInt(), cityJson.get("width").getAsInt(), cityJson.get("x").getAsInt(), cityJson.get("y").getAsInt(), cityJson.get("type").getAsString().equals("city")));
+            map.cities.add(new City(
+                city,
+                cityJson.get("height").getAsInt(),
+                cityJson.get("width").getAsInt(),
+                cityJson.get("x").getAsInt(),
+                cityJson.get("y").getAsInt(),
+                cityJson.get("type").getAsString().equals("city")
+            ));
         }
 
         JsonArray routes = data.getAsJsonArray("routes");
@@ -76,7 +94,16 @@ public class MapManager {
             JsonArray tiles = routeData.getAsJsonArray("tiles");
             for (JsonElement jsonTile : tiles) {
                 JsonObject tileData = jsonTile.getAsJsonObject();
-                route.tiles.add(new Route.Tile(tileData.get("rotation").getAsInt(), tileData.get("width").getAsInt(), tileData.get("height").getAsInt(), data.get("tile_x").getAsInt(), data.get("tile_y").getAsInt(), tileData.get("x").getAsInt(), tileData.get("y").getAsInt(), Route.TileType.valueOf(tileData.get("type").getAsString().toUpperCase())));
+                route.tiles.add(new Route.Tile(
+                    tileData.get("rotation").getAsInt(),
+                    tileData.get("width").getAsInt(),
+                    tileData.get("height").getAsInt(),
+                    data.get("tile_x").getAsInt(),
+                    data.get("tile_y").getAsInt(),
+                    tileData.get("x").getAsInt(),
+                    tileData.get("y").getAsInt(),
+                    Route.TileType.valueOf(tileData.get("type").getAsString().toUpperCase())
+                ));
             }
 
             map.routes.add(route);
@@ -85,7 +112,12 @@ public class MapManager {
         JsonObject pointBoard = data.getAsJsonObject("point_board");
         for (String key : pointBoard.keySet()) {
             JsonObject pointBoardJson = pointBoard.getAsJsonObject(key);
-            map.pointBoard.put(Integer.parseInt(key), new GameMap.PointSquare(pointBoardJson.get("x").getAsInt(), pointBoardJson.get("y").getAsInt(), pointBoardJson.get("width").getAsInt(), pointBoardJson.get("height").getAsInt()));
+            map.pointBoard.put(Integer.parseInt(key), new GameMap.PointSquare(
+                    pointBoardJson.get("x").getAsInt(),
+                    pointBoardJson.get("y").getAsInt(),
+                    pointBoardJson.get("width").getAsInt(),
+                    pointBoardJson.get("height").getAsInt()
+            ));
         }
 
         for (String tile : tileMapData.keySet()) {

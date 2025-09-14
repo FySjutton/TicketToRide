@@ -1,26 +1,20 @@
 package avox.test.ticketToRide.game;
 
 import avox.test.ticketToRide.config.ArenaManager;
-import avox.test.ticketToRide.config.FileConverter;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.renderer.MapSummoner;
 import avox.test.ticketToRide.renderer.TrainRenderer;
 import avox.test.ticketToRide.utils.BillboardManager;
-import avox.test.ticketToRide.config.MapManager;
 import avox.test.ticketToRide.utils.board.MarkerManager;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static avox.test.ticketToRide.TicketToRide.playerStateManager;
 
@@ -29,7 +23,7 @@ public class GameManager {
     public static ArrayList<Player> activePlayers = new ArrayList<>();
     public static ArrayList<Game> activeGames = new ArrayList<>();
 
-    public static boolean createGame(JavaPlugin plugin, Player gameOwner, GameMap gameMap, ArenaBase arena) {
+    public static boolean createGame(JavaPlugin plugin, Player gameOwner, GameMap gameMap, BaseArena arena) {
         try {
 //            GameMap gameMap = FileConverter.convertFileToMap(new File(plugin.getDataFolder() + "/maps", map));
 //            Arena gameArena = FileConverter.convertFileToArena(arena, new File(plugin.getDataFolder() + "/arenas", arena));

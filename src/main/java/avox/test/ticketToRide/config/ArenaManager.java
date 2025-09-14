@@ -1,8 +1,7 @@
 package avox.test.ticketToRide.config;
 
 import avox.test.ticketToRide.TicketToRide;
-import avox.test.ticketToRide.game.Arena;
-import avox.test.ticketToRide.game.ArenaBase;
+import avox.test.ticketToRide.game.BaseArena;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,10 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.UUID;
 
 public class ArenaManager {
-    public static ArrayList<ArenaBase> arenas = new ArrayList<>();
+    public static ArrayList<BaseArena> arenas = new ArrayList<>();
 
     public static void loadArenas(File arenaFolder) {
         arenas.clear();
@@ -38,8 +36,6 @@ public class ArenaManager {
     public static World loadArena(String mapName, String instanceId) {
         File source = new File(TicketToRide.plugin.getDataFolder(), "arenas/" + mapName + "/world");
         File target = new File(Bukkit.getWorldContainer(), instanceId);
-
-
 
         copyArenaWorld(source.toPath(), target.toPath());
 
@@ -110,7 +106,7 @@ public class ArenaManager {
         }
     }
 
-    public static ArenaBase convertFileToArena(File folder) {
+    public static BaseArena convertFileToArena(File folder) {
         if (!folder.isDirectory()) {
             throw new IllegalArgumentException("Expected folder, got file: " + folder.getPath());
         }
@@ -124,7 +120,7 @@ public class ArenaManager {
 
         try (FileReader dataReader = new FileReader(dataFile)) {
             JsonObject dataJson = JsonParser.parseReader(dataReader).getAsJsonObject();
-            return loadArena(dataJson);
+            return loadArena(folder.getName(), dataJson);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -132,16 +128,26 @@ public class ArenaManager {
         return null;
     }
 
-    private static ArenaBase loadArena(JsonObject data) {
+    private static BaseArena loadArena(String fileName, JsonObject data) {
         JsonArray spawn = data.get("spawn").getAsJsonArray();
         JsonArray mapOrigin = data.get("map_origin").getAsJsonArray();
 
-        return new ArenaBase(
+        BaseArena arena = new BaseArena(
             data.get("name").getAsString(),
+            fileName,
+            data.get("texture").getAsString(),
+            data.get("description").getAsString(),
             new Location(null, spawn.get(0).getAsFloat(), spawn.get(1).getAsFloat(), spawn.get(2).getAsFloat(), spawn.get(3).getAsFloat(), spawn.get(4).getAsFloat()),
             new Location(null, mapOrigin.get(0).getAsFloat(), mapOrigin.get(1).getAsFloat(), mapOrigin.get(2).getAsFloat()),
             data.get("size_x").getAsInt(),
             data.get("size_y").getAsInt()
         );
+
+        JsonArray billboardJson = data.get("billboards").getAsJsonArray();
+        for (JsonElement billboard : billboardJson.asList()) {
+            JsonArray billboardArray = billboard.getAsJsonArray();
+            arena.billboards.add(new Location(null, billboardArray.get(0).getAsFloat(), billboardArray.get(1).getAsFloat(), billboardArray.get(2).getAsFloat(), billboardArray.get(3).getAsFloat(), 0));
+        }
+        return arena;
     }
 }

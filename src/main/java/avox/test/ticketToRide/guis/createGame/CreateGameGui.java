@@ -1,40 +1,125 @@
 package avox.test.ticketToRide.guis.createGame;
 
-import avox.test.ticketToRide.utils.PlayerGuiManager;
+import avox.test.ticketToRide.TicketToRide;
+import avox.test.ticketToRide.game.BaseArena;
+import avox.test.ticketToRide.game.GameManager;
+import avox.test.ticketToRide.game.GameMap;
+import avox.test.ticketToRide.guis.GuiTools;
+import avox.test.ticketToRide.guis.InventoryGui;
+import avox.test.ticketToRide.guis.PlayerGuiManager;
+import avox.test.ticketToRide.guis.general.SelectObjectGui;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-public class CreateGameGui {
-    private final Inventory gui;
+import static avox.test.ticketToRide.commands.MainCommand.invitePlayer;
+import static avox.test.ticketToRide.guis.GuiTools.*;
 
-    private ItemStack mapSetting;
-    private ItemStack arenaSetting;
+public class CreateGameGui extends InventoryGui {
+    private final ArrayList<Player> opponents = new ArrayList<>();
+    private ItemStack createGame;
+    private String error = "You must invite some players first!";
+    
+    public CreateGameGui(Player player, Component name, GameMap gameMap, BaseArena arena) {
+        super(player, 27, name);
 
-    public CreateGameGui(Player player) {
-        gui = Bukkit.createInventory(null, 27, "Game GUI");
+        gui.setItem(11, GuiTools.format(
+                createHead(gameMap.headTexture),
+                GuiTools.colorize(Component.text("Map: ", Style.style(TextDecoration.BOLD)).append(Component.text(gameMap.name).decoration(TextDecoration.BOLD, false)), NamedTextColor.YELLOW),
+                List.of(GuiTools.colorize(Component.text(gameMap.description), NamedTextColor.GRAY))
+        ));
 
-        mapSetting = GuiTools.createHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTUwMTU0NzBlMjg2ZTRlZDc3YTAzODc2Y2JiZmQ3YjNkMzU4YTYwNjA2YjQ0NmQyYzRiYzhkOGU5YzM3M2VlOSJ9fX0=");
-        mapSetting.editMeta(meta -> meta.customName(Component.text("Map", NamedTextColor.YELLOW).decoration(TextDecoration.BOLD, true)));
-        gui.setItem(11, mapSetting);
+        gui.setItem(13, GuiTools.format(
+                createHead(arena.texture),
+                GuiTools.colorize(Component.text("Arena: ", Style.style(TextDecoration.BOLD)).append(Component.text(arena.name).decoration(TextDecoration.BOLD, false)), NamedTextColor.YELLOW),
+                List.of(GuiTools.colorize(Component.text(arena.description), NamedTextColor.GRAY))
+        ));
 
-        arenaSetting = new ItemStack(Material.RED_CONCRETE);
-        gui.setItem(13, arenaSetting);
 
-        gui.setItem(15, new ItemStack(Material.RED_CONCRETE));
+        ItemStack opponentButton = GuiTools.format(
+                new ItemStack(Material.PLAYER_HEAD),
+                getYellow("Opponents"),
+                List.of(getGray("Click to select opponents!"))
+        );
+        gui.setItem(15, opponentButton);
+        actions.put(15, () -> chooseOpponents(player));
 
-        PlayerGuiManager.createGui(gui, player);
+        updateCreateButton();
+        actions.put(26, () -> {
+            if (createGame.getType() == Material.RED_CONCRETE) {
+                player.sendMessage(Component.text(error, NamedTextColor.RED));
+            } else {
+                player.closeInventory();
+                GameManager.createGame(TicketToRide.plugin, player, gameMap, arena);
+                player.sendMessage("§aGame successfully created!");
+
+                for (Player opponent : opponents) {
+                    invitePlayer(opponent, player, false);
+                }
+            }
+        });
+    }
+    
+    private void chooseOpponents(Player player) {
+        player.closeInventory();
+        SelectObjectGui<Opponent> opponentScreen = new SelectObjectGui<>(player, Component.text("Choose opponents to invite"));
+        Component selectedText = GuiTools.colorize("Selected!", NamedTextColor.GREEN);
+        Component unselectedText = GuiTools.colorize("Click to invite!", NamedTextColor.GRAY);
+
+        ArrayList<SelectObjectGui<Opponent>.ObjectEntry> entries = new ArrayList<>(Bukkit.getOnlinePlayers().stream().filter(user -> !Objects.equals(user.getPlayer(), player)).map(user -> opponentScreen.new ObjectEntry(
+                getYellow(user.getName()),
+                opponents.contains(user) ? selectedText : unselectedText,
+                user.getPlayerProfile().getTextures().getSkin().toString(),
+                new Opponent(user),
+                opponents.contains(user),
+                GameManager.activePlayers.contains(user),
+                GameManager.activePlayers.contains(user) ? colorize("Already in a game!", NamedTextColor.RED) : null
+        )).toList());
+
+        opponentScreen.initMultiselect(
+                entries,
+                (obj) -> obj.description = obj.selected ? selectedText : unselectedText ,
+                (result) -> {
+                    player.closeInventory();
+                    player.openInventory(gui);
+                    PlayerGuiManager.createGui(gui, player, actions);
+                    opponents.clear();
+                    opponents.addAll(result.stream().map(obj -> obj.element.player).toList());
+                    if (opponents.isEmpty()) {
+                        error = "You must invite some players first!";
+                    } else {
+                        error = "";
+                    }
+                    updateCreateButton();
+                }
+        );
+
+        player.openInventory(opponentScreen.getInventory());
     }
 
-    public Inventory getInventory() {
-        return gui;
+    private void updateCreateButton() {
+        createGame = GuiTools.format(
+                new ItemStack(error.isEmpty() ? Material.GREEN_CONCRETE : Material.RED_CONCRETE),
+                GuiTools.colorize(Component.text("Create Game"), error.isEmpty() ? NamedTextColor.GREEN : NamedTextColor.RED),
+                List.of(GuiTools.colorize(Component.text(error), NamedTextColor.GRAY))
+        );
+        gui.setItem(26, createGame);
+    }
+
+    public static class Opponent {
+        public Player player;
+        
+        public Opponent(Player player) {
+            this.player = player;
+        }
     }
 }

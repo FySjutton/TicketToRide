@@ -72,6 +72,7 @@ public class BillboardManager {
     }
 
     private void spawnBillboardSection(World world, Location location, String heading, List<String> lines) {
+        System.out.println(location);
         spawnLine(world, location,
                 Component.text(heading)
                         .decorate(TextDecoration.BOLD)

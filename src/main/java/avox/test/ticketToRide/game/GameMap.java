@@ -11,6 +11,7 @@ import java.util.Map;
 public class GameMap {
     public String name;
     public String version;
+    public String description;
 
     public File map;
 
@@ -27,9 +28,11 @@ public class GameMap {
     public int tilesY;
 
     public int pointBoardSize;
+    public String headTexture;
 
-    public GameMap(String name, File map, String version, int height, int width, int tilesX, int tilesY, int pointBoardSize) {
+    public GameMap(String name, String description, File map, String version, int height, int width, int tilesX, int tilesY, int pointBoardSize, String headTexture) {
         this.name = name;
+        this.description = description;
         this.map = map;
         this.version = version;
         this.height = height;
@@ -37,6 +40,7 @@ public class GameMap {
         this.tilesX = tilesX;
         this.tilesY = tilesY;
         this.pointBoardSize = pointBoardSize;
+        this.headTexture = headTexture;
     }
 
     public City getCity(String name) {
