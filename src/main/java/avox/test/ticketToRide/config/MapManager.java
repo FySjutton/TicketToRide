@@ -106,6 +106,7 @@ public class MapManager {
                 ));
             }
 
+            route.length = route.tiles.size();
             map.routes.add(route);
         }
 

@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class GameMap {
     public String name;
@@ -53,6 +54,10 @@ public class GameMap {
 
     public Location getStartLocation(Arena arena) {
         return arena.mapStartPosition.clone().add((double) ((tilesX * 128 - width) / 2) / 128, 0, (double) ((tilesY * 128 -height) / 2) / 128);
+    }
+
+    public City getRandomCity() {
+        return cities.get(new Random().nextInt(0, cities.size()));
     }
 
     public record Color(String color, Material material) {}

@@ -11,6 +11,7 @@ public class Route {
 
     public GameMap.Color color;
     public ArrayList<Tile> tiles = new ArrayList<>();
+    public int length;
 
     public Route(City point_a, City point_b, GameMap.Color color) {
         this.point_a = point_a;

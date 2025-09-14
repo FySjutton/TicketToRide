@@ -3,7 +3,6 @@ package avox.test.ticketToRide.game;
 import avox.test.ticketToRide.config.ArenaManager;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.renderer.MapSummoner;
-import avox.test.ticketToRide.renderer.TrainRenderer;
 import avox.test.ticketToRide.utils.BillboardManager;
 import avox.test.ticketToRide.utils.board.MarkerManager;
 import org.bukkit.Color;
@@ -23,36 +22,30 @@ public class GameManager {
     public static ArrayList<Player> activePlayers = new ArrayList<>();
     public static ArrayList<Game> activeGames = new ArrayList<>();
 
-    public static boolean createGame(JavaPlugin plugin, Player gameOwner, GameMap gameMap, BaseArena arena) {
+    public static void createGame(JavaPlugin plugin, Player gameOwner, GameMap gameMap, BaseArena arena) {
         try {
-//            GameMap gameMap = FileConverter.convertFileToMap(new File(plugin.getDataFolder() + "/maps", map));
-//            Arena gameArena = FileConverter.convertFileToArena(arena, new File(plugin.getDataFolder() + "/arenas", arena));
             Arena gameArena = arena.initiateArena();
             if (gameMap == null || gameArena == null) {
-                return false;
+                return;
             }
 
             new MapSummoner().generateAndDisplay(gameArena.world, gameMap.map, gameArena.mapStartPosition, gameMap.tilesX, gameMap.tilesY);
-//        new TrainRenderer().spawnSmallTrainCar(gameWorld, base);
-
             new BillboardManager().summonBillboards(gameArena);
 
 
             // Testing
-            TrainRenderer renderer = new TrainRenderer();
-            for (Route route : gameMap.routes) {
-                for (Route.Tile tile : route.tiles) {
-                    renderer.spawnSmallTrainCar(gameArena, gameMap, tile);
-                }
-            }
+//            TrainRenderer renderer = new TrainRenderer();
+//            for (Route route : gameMap.routes) {
+//                for (Route.Tile tile : route.tiles) {
+//                    renderer.spawnSmallTrainCar(gameArena, gameMap, tile);
+//                }
+//            }
 
             activeGames.add(new Game(gameOwner, gameArena, gameMap));
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return false;
     }
 
     public static void startGame(Game game) {
@@ -69,6 +62,8 @@ public class GameManager {
             player.points = 0;
             markerManager.reposition(game, player, player.points);
         }
+
+
     }
 
     public static void deleteGame(Game game) {
