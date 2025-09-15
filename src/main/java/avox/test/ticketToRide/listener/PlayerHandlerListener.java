@@ -50,7 +50,7 @@ public class PlayerHandlerListener implements Listener {
             pendingLeaves.remove(player);
             Game game = GameManager.getGameByUser(player);
             if (game != null) {
-                for (Player gamePlayer : game.members) {
+                for (Player gamePlayer : game.gamePlayers.keySet()) {
                     gamePlayer.sendMessage("§a" + player.getName() + " rejoined!");
                 }
             }
@@ -120,11 +120,11 @@ public class PlayerHandlerListener implements Listener {
         if (GameManager.activePlayers.contains(event.getPlayer())) {
             Game game = GameManager.getGameByUser(event.getPlayer());
             if (game != null) {
-                if (game.members.size() == 1) {
+                if (game.gamePlayers.size() == 1) {
                     game.leaveGame(event.getPlayer());
                 } else {
                     pendingLeaves.put(event.getPlayer(), System.currentTimeMillis());
-                    for (Player player : game.members) {
+                    for (Player player : game.gamePlayers.keySet()) {
                         player.sendMessage("§e" + event.getPlayer().getName() + "§c left the server!\n§7They have one minute to rejoin before being kicked from the game!");
                     }
                 }

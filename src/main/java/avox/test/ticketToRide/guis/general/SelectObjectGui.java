@@ -1,5 +1,6 @@
 package avox.test.ticketToRide.guis.general;
 
+import avox.test.ticketToRide.guis.GuiAction;
 import avox.test.ticketToRide.guis.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
 import net.kyori.adventure.text.Component;
@@ -49,13 +50,13 @@ public class SelectObjectGui<T> extends InventoryGui {
 
     private void updateInventory() {
         gui.clear();
-        actions.clear();
+        actionManager.clear();
         List<ObjectEntry> pageMaps = options.subList(page * 27 - 27, Math.min(page * 27, options.size()));
         int slot = 0;
         for (ObjectEntry map : pageMaps) {
             ItemStack item = GuiTools.format(GuiTools.createHead(map.texture), map.name, List.of(map.error ? map.message : map.description));
             int finalSlot = slot;
-            actions.put(slot, () -> {
+            actionManager.setSlot(gui, item, slot, GuiAction.ofClick(() -> {
                 if (!map.error) {
                     if (multiselect) {
                         map.selected = !map.selected;
@@ -65,9 +66,7 @@ public class SelectObjectGui<T> extends InventoryGui {
                     action.accept(map);
                     updateInventory();
                 }
-            });
-
-            gui.setItem(slot, item);
+            }));
             slot++;
         }
 
@@ -78,8 +77,7 @@ public class SelectObjectGui<T> extends InventoryGui {
                 List.of(colorize(Component.text("Click to invite all selected players!"), NamedTextColor.GRAY))
             );
 
-            actions.put(31, () -> finalAction.accept(new ArrayList<>(options.stream().filter(option -> option.selected).toList())));
-            gui.setItem(31, finishButton);
+            actionManager.setSlot(gui, finishButton, 31, GuiAction.ofClick(() -> finalAction.accept(new ArrayList<>(options.stream().filter(option -> option.selected).toList()))));
         }
 
         if (pages > 1 && pages != page) {
@@ -89,12 +87,11 @@ public class SelectObjectGui<T> extends InventoryGui {
                 List.of(colorize(Component.text("Page " + (page + 1) + "/" + pages), NamedTextColor.GRAY))
             );
 
-            actions.put(35, () -> {
+            actionManager.setSlot(gui, arrow, 35, GuiAction.ofClick(() -> {
                 gui.clear(35);
                 page++;
                 updateInventory();
-            });
-            gui.setItem(35, arrow);
+            }));
         }
         if (page > 1) {
             ItemStack arrow = GuiTools.format(
@@ -103,12 +100,11 @@ public class SelectObjectGui<T> extends InventoryGui {
                     List.of(colorize(Component.text("Page " + (page - 1) + "/" + pages), NamedTextColor.GRAY))
             );
 
-            actions.put(27, () -> {
+            actionManager.setSlot(gui, arrow, 27, GuiAction.ofClick(() -> {
                 gui.clear(27);
                 page--;
                 updateInventory();
-            });
-            gui.setItem(27, arrow);
+            }));
         }
     }
 

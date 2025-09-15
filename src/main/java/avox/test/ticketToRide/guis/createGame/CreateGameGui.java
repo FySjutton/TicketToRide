@@ -4,6 +4,7 @@ import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.game.BaseArena;
 import avox.test.ticketToRide.game.GameManager;
 import avox.test.ticketToRide.game.GameMap;
+import avox.test.ticketToRide.guis.GuiAction;
 import avox.test.ticketToRide.guis.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
 import avox.test.ticketToRide.guis.PlayerGuiManager;
@@ -50,11 +51,10 @@ public class CreateGameGui extends InventoryGui {
                 getYellow("Opponents"),
                 List.of(getGray("Click to select opponents!"))
         );
-        gui.setItem(15, opponentButton);
-        actions.put(15, () -> chooseOpponents(player));
+        actionManager.setSlot(gui, opponentButton, 15, GuiAction.ofClick(() -> chooseOpponents(player)));
 
         updateCreateButton();
-        actions.put(26, () -> {
+        actionManager.setSlot(26, GuiAction.ofClick(() -> {
             if (createGame.getType() == Material.RED_CONCRETE) {
                 player.sendMessage(Component.text(error, NamedTextColor.RED));
             } else {
@@ -66,7 +66,7 @@ public class CreateGameGui extends InventoryGui {
                     invitePlayer(opponent, player, false);
                 }
             }
-        });
+        }));
     }
     
     private void chooseOpponents(Player player) {
@@ -91,7 +91,7 @@ public class CreateGameGui extends InventoryGui {
                 (result) -> {
                     player.closeInventory();
                     player.openInventory(gui);
-                    PlayerGuiManager.createGui(gui, player, actions);
+                    PlayerGuiManager.createGui(gui, player, actionManager, false);
                     opponents.clear();
                     opponents.addAll(result.stream().map(obj -> obj.element.player).toList());
                     if (opponents.isEmpty()) {

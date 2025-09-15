@@ -1,22 +1,12 @@
 package avox.test.ticketToRide.commands;
 
-import avox.test.ticketToRide.config.MapManager;
 import avox.test.ticketToRide.game.*;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.utils.board.MarkerManager;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
@@ -29,7 +19,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static avox.test.ticketToRide.game.GameManager.*;
 
@@ -44,7 +33,7 @@ public class TestCommand {
                             .executes(ctx -> {
                                 Player sender = (Player) ctx.getSource().getSender();
                                 Game game = getGameByUser(sender);
-                                GamePlayer player = game.players.stream().filter(p -> p.player == sender).toList().getFirst();
+                                GamePlayer player = game.gamePlayers.get(sender);
                                 player.points += IntegerArgumentType.getInteger(ctx, "amount");
                                 new MarkerManager().reposition(game, player, player.points);
                                 return 1;
@@ -62,8 +51,9 @@ public class TestCommand {
                             City b = map.getRandomCity();
 
                             System.out.println("heer");
-                            DestinationCard.PathFinder pathFinder = new DestinationCard.PathFinder();
-                            int reward = pathFinder.getReward(map, a, b);
+                            RewardCalculator rewardCalculator = new RewardCalculator();
+                            int reward = rewardCalculator.getReward(map, a, b);
+//                            pathFinder.test(map, sender);
 
                             sender.sendMessage("§e§l" + reward + "§r§afor A: §e" + a.name() + "§a, B: §e" + b.name());
                             System.out.println("heer2");

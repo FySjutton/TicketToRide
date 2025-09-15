@@ -94,7 +94,7 @@ public class MainCommand {
                             if (game != null) {
                                 if (game.started) {
                                     sender.sendMessage("§cThe game has already started!");
-                                } else if (game.players.size() < 2) {
+                                } else if (game.gamePlayers.size() < 2) {
                                     sender.sendMessage("§cNot enough players! Must be at least two.");
                                 } else {
                                     GameManager.startGame(game);
@@ -131,13 +131,13 @@ public class MainCommand {
                                     Game game = getGameByOwner(target);
 
                                     if (game != null) {
-                                        if (game.players.size() >= 5) {
+                                        if (game.gamePlayers.size() >= 5) {
                                             sender.sendMessage("§cThis game is already full!");
                                             game.invites.remove(sender);
                                         } else if (game.invites.contains(sender)) {
                                             game.invites.remove(sender);
                                             game.addPlayer(sender);
-                                            for (GamePlayer player : game.players) {
+                                            for (GamePlayer player : game.gamePlayers.values()) {
                                                 player.player.sendMessage("§e" + sender.getName() + "§a joined the game!");
                                             }
                                             return 1;
@@ -161,7 +161,7 @@ public class MainCommand {
                                         if (game.invites.contains(sender)) {
                                             game.invites.remove(sender);
                                             sender.sendMessage("&cYou declined the T2R game invitation.");
-                                            for (GamePlayer player : game.players) {
+                                            for (GamePlayer player : game.gamePlayers.values()) {
                                                 player.player.sendMessage("§e" + sender.getName() + " §cdeclined the invitation to the game!");
                                             }
                                             return 1;
@@ -176,7 +176,7 @@ public class MainCommand {
                         .executes(ctx -> {
                             Player sender = (Player) ctx.getSource().getSender();
                             if (activePlayers.contains(sender)) {
-                                Game game = activeGames.stream().filter(a -> a.members.contains(sender)).toList().getFirst();
+                                Game game = activeGames.stream().filter(a -> a.gamePlayers.containsKey(sender)).toList().getFirst();
                                 game.leaveGame(sender);
                                 return 1;
                             } else {

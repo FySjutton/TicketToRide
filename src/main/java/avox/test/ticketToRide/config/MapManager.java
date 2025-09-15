@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MapManager {
@@ -120,6 +121,27 @@ public class MapManager {
                     pointBoardJson.get("height").getAsInt()
             ));
         }
+
+        JsonObject mapPoints = data.getAsJsonObject("map_points");
+        List<GameMap.LengthPoints> result = new ArrayList<>();
+
+        for (String key : mapPoints.keySet()) {
+            int points = mapPoints.get(key).getAsInt();
+
+            if (key.endsWith("+")) {
+                int min = Integer.parseInt(key.replace("+", ""));
+                result.add(new GameMap.LengthPoints(min, Integer.MAX_VALUE, points));
+            } else if (key.contains("-")) {
+                String[] parts = key.split("-");
+                int min = Integer.parseInt(parts[0]);
+                int max = Integer.parseInt(parts[1]);
+                result.add(new GameMap.LengthPoints(min, max, points));
+            } else {
+                int len = Integer.parseInt(key);
+                result.add(new GameMap.LengthPoints(len, len, points));
+            }
+        }
+        map.mapPoints = new ArrayList<>(result);
 
         for (String tile : tileMapData.keySet()) {
             JsonArray tileTopLeft = tileMapData.getAsJsonObject(tile).get("center").getAsJsonArray();

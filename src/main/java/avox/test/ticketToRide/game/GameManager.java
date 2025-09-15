@@ -50,9 +50,10 @@ public class GameManager {
 
     public static void startGame(Game game) {
         game.started = true;
+        game.gameHandler = new GameHandler(game);
 
         MarkerManager markerManager = new MarkerManager();
-        for (GamePlayer player : game.players) {
+        for (GamePlayer player : game.gamePlayers.values()) {
             player.player.getInventory().setBoots(setLeatherColor(new ItemStack(Material.LEATHER_BOOTS), player.markerData.getLeft()));
             player.player.getInventory().setLeggings(setLeatherColor(new ItemStack(Material.LEATHER_LEGGINGS), player.markerData.getLeft()));
             player.player.getInventory().setChestplate(setLeatherColor(new ItemStack(Material.LEATHER_CHESTPLATE), player.markerData.getLeft()));
@@ -62,8 +63,6 @@ public class GameManager {
             player.points = 0;
             markerManager.reposition(game, player, player.points);
         }
-
-
     }
 
     public static void deleteGame(Game game) {
@@ -86,7 +85,7 @@ public class GameManager {
     }
 
     public static Game getGameByUser(Player player) {
-        List<Game> games = activeGames.stream().filter(game -> game.members.contains(player)).toList();
+        List<Game> games = activeGames.stream().filter(game -> game.gamePlayers.containsKey(player)).toList();
         if (games.isEmpty()) return null;
         return games.getFirst();
     }

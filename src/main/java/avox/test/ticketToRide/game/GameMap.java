@@ -21,6 +21,7 @@ public class GameMap {
     public ArrayList<Route> routes = new ArrayList<>();
     public HashMap<Integer, TileMap> tileMaps = new HashMap<>();
     public HashMap<Integer, PointSquare> pointBoard = new HashMap<>();
+    public ArrayList<LengthPoints> mapPoints;
 
     public int height;
     public int width;
@@ -100,6 +101,22 @@ public class GameMap {
             this.y = y;
             this.width = width;
             this.height = height;
+        }
+    }
+
+    public static class LengthPoints {
+        public int min;
+        public int max;
+        public int points;
+
+        public LengthPoints(int min, int max, int points) {
+            this.min = min;
+            this.max = max;
+            this.points = points;
+        }
+
+        public boolean matches(int length) {
+            return length >= min && length <= max;
         }
     }
 }

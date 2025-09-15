@@ -14,6 +14,7 @@ import org.bukkit.entity.TextDisplay;
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import static avox.test.ticketToRide.TicketToRide.playerStateManager;
@@ -23,9 +24,10 @@ public class Game {
     public Arena arena;
 
     public boolean started = false;
+    public GameHandler gameHandler;
+
     public Player gameOwner;
-    public ArrayList<Player> members = new ArrayList<>();
-    public ArrayList<GamePlayer> players = new ArrayList<>();
+    public HashMap<Player, GamePlayer> gamePlayers = new HashMap<>();
     public ArrayList<Player> invites = new ArrayList<>();
 
     private TextDisplay infoText;
@@ -42,8 +44,7 @@ public class Game {
 
     public void addPlayer(Player player) {
         playerStateManager.savePlayer(player);
-        players.add(new GamePlayer(this, player));
-        members.add(player);
+        gamePlayers.put(player, new GamePlayer(this, player));
 
         player.getInventory().clear();
         player.setHealth(20);
@@ -54,7 +55,7 @@ public class Game {
         GameManager.activePlayers.add(player);
         player.teleport(arena.spawnPosition);
 
-        if (infoTextStep == 1 && members.size() >= 2) {
+        if (infoTextStep == 1 && gamePlayers.size() >= 2) {
             infoTextStep = 2;
             infoText.text(Component.text("Start the game using /t2r start!", NamedTextColor.GREEN));
         }
@@ -62,35 +63,34 @@ public class Game {
 
     public void leaveGame(Player player) {
         playerStateManager.restorePlayer(player);
-        GamePlayer gamePlayer = players.stream().filter(p -> p.player == player).toList().getFirst();
-        players.remove(gamePlayer);
+        GamePlayer gamePlayer = gamePlayers.get(player);
+        gamePlayers.remove(player);
         GameManager.activePlayers.remove(player);
-        members.remove(player);
         if (gamePlayer.marker != null) {
             gamePlayer.marker.remove();
         }
 
-        for (GamePlayer user : players) {
-            user.player.sendMessage("§e" + player.getName() + " §cleft the game!");
+        for (Player user : gamePlayers.keySet()) {
+            user.sendMessage("§e" + player.getName() + " §cleft the game!");
             if (player == gameOwner) {
-                user.player.sendMessage("§cThe host left the game!");
+                user.sendMessage("§cThe host left the game!");
             }
         }
         player.sendMessage("§cYou left the game!");
 
-        if (!started && members.size() <= 2 && infoTextStep != 1) {
+        if (!started && gamePlayers.size() <= 2 && infoTextStep != 1) {
             infoTextStep = 1;
             infoText.text(Component.text("Not enough players to start!", NamedTextColor.RED));
         }
 
-        if (members.isEmpty() || (started && members.size() < 2)) {
+        if (gamePlayers.isEmpty() || (started && gamePlayers.size() < 2)) {
             GameManager.deleteGame(this);
             return;
         }
 
         if (player == gameOwner) {
-            GameManager.changeOwner(this, members.get(new Random().nextInt(0, members.size())));
-            for (Player user : members) {
+            GameManager.changeOwner(this, gamePlayers.keySet().stream().toList().get(new Random().nextInt(0, gamePlayers.size())));
+            for (Player user : gamePlayers.keySet()) {
                 user.sendMessage("§e" + gameOwner.getName() + "§7 is now the host of this game!");
             }
         }

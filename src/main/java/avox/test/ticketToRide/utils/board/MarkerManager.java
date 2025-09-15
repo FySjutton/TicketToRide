@@ -35,7 +35,7 @@ public class MarkerManager {
     public void reposition(Game game, GamePlayer player, int points) {
         ItemDisplay marker = player.marker;
         int square = getSquare(points % game.gameMap.pointBoardSize);
-        int stacked = Math.toIntExact(game.players.stream().filter(p -> p.points != -1 && p.player != player.player && getSquare(p.points % game.gameMap.pointBoardSize) == square).count());
+        int stacked = Math.toIntExact(game.gamePlayers.values().stream().filter(p -> p.points != -1 && p.player != player.player && getSquare(p.points % game.gameMap.pointBoardSize) == square).count());
 
         GameMap.PointSquare pointSquare = game.gameMap.pointBoard.get(square);
         int x = pointSquare.x + pointSquare.width / 2;

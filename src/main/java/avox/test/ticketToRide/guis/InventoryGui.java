@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class InventoryGui {
     public final Inventory gui;
-    public final Map<Integer, Runnable> actions = new HashMap<>();
+    public final ActionManager actionManager = new ActionManager();
 
     public InventoryGui(Player player, int size, Component name) {
         gui = Bukkit.createInventory(null, size, name);
-        PlayerGuiManager.createGui(gui, player, actions);
+        PlayerGuiManager.createGui(gui, player, actionManager, false);
     }
 
     public Inventory getInventory() {
