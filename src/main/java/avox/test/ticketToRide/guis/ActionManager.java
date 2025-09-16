@@ -4,16 +4,17 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class ActionManager {
-    public HashMap<Integer, GuiAction> actions = new HashMap<>();
+    public HashMap<Integer, ArrayList<GuiAction>> actions = new HashMap<>();
 
-    public void setSlot(int slot, GuiAction action) {
-        actions.put(slot, action);
+    public void addAction(int slot, GuiAction action) {
+        actions.computeIfAbsent(slot, k -> new ArrayList<>()).add(action);
     }
 
-    public void setSlot(Inventory inventory, ItemStack stack, int slot, GuiAction action) {
-        actions.put(slot, action);
+    public void addAction(Inventory inventory, ItemStack stack, int slot, GuiAction action) {
+        addAction(slot, action);
         inventory.setItem(slot, stack);
     }
 

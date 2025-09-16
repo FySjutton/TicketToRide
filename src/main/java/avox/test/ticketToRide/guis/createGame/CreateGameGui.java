@@ -51,10 +51,10 @@ public class CreateGameGui extends InventoryGui {
                 getYellow("Opponents"),
                 List.of(getGray("Click to select opponents!"))
         );
-        actionManager.setSlot(gui, opponentButton, 15, GuiAction.ofClick(() -> chooseOpponents(player)));
+        actionManager.addAction(gui, opponentButton, 15, GuiAction.ofClick(() -> chooseOpponents(player)));
 
         updateCreateButton();
-        actionManager.setSlot(26, GuiAction.ofClick(() -> {
+        actionManager.addAction(26, GuiAction.ofClick(() -> {
             if (createGame.getType() == Material.RED_CONCRETE) {
                 player.sendMessage(Component.text(error, NamedTextColor.RED));
             } else {

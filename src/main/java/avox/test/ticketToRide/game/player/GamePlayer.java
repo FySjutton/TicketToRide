@@ -1,9 +1,11 @@
 package avox.test.ticketToRide.game.player;
 
+import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.game.DestinationCard;
 import avox.test.ticketToRide.game.Game;
 import avox.test.ticketToRide.utils.board.MarkerManager;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,14 +53,25 @@ public class GamePlayer {
     );
 
     public void setBeacon1(int x, int y) {
-        setBeacon(x, y, beacon1);
+        beacon1 = setBeacon(x, y, beacon1);
     }
 
     public void setBeacon2(int x, int y) {
-        setBeacon(x, y, beacon2);
+        beacon2 = setBeacon(x, y, beacon2);
     }
 
-    private void setBeacon(int x, int y, ItemDisplay beacon) {
+    public void clearBeacons() {
+        if (beacon1 != null) {
+            beacon1.remove();
+        }
+        if (beacon2 != null) {
+            beacon2.remove();
+        }
+        beacon1 = null;
+        beacon2 = null;
+    }
+
+    private ItemDisplay setBeacon(int x, int y, ItemDisplay beacon) {
         if (beacon != null) {
             beacon.remove();
         }
@@ -78,5 +91,12 @@ public class GamePlayer {
         beacon.setBillboard(Display.Billboard.FIXED);
         beacon.setViewRange(20);
         beacon.setPersistent(true);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.hideEntity(TicketToRide.plugin, beacon);
+        }
+        player.showEntity(TicketToRide.plugin, beacon);
+
+        return beacon;
     }
 }
