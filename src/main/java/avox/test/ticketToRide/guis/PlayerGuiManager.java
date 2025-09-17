@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,7 +24,7 @@ public class PlayerGuiManager implements Listener {
 
     public static void createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly) {
         playerInventories.put(player, new GuiInventory(inventory, hotbarOnly));
-        playerActions.put(player, new HashMap<>(slotActions.actions));
+        playerActions.put(player, slotActions.actions);
     }
 
     public static class GuiInventory {
@@ -38,26 +39,19 @@ public class PlayerGuiManager implements Listener {
 
     // --- Helper methods ---
     private boolean isRegistered(Player player) {
-        boolean registered = playerInventories.containsKey(player);
-        System.out.println("[GUI] Player " + player.getName() + " registered? " + registered);
-        return registered;
+        return playerInventories.containsKey(player);
     }
 
     private void runSlotActions(Player player, int slot, boolean runHoldAction) {
         Map<Integer, ArrayList<GuiAction>> actions = playerActions.get(player);
         if (actions != null && actions.containsKey(slot)) {
-            System.out.println("[GUI] Running actions for player " + player.getName() + " slot " + slot + " (hold=" + runHoldAction + ")");
             for (GuiAction action : actions.get(slot)) {
                 if (runHoldAction && action.holdAction != null) {
-                    System.out.println("[GUI] Running holdAction for slot " + slot);
                     action.holdAction.run();
                 } else if (!runHoldAction && action.clickAction != null) {
-                    System.out.println("[GUI] Running clickAction for slot " + slot);
                     action.clickAction.run();
                 }
             }
-        } else {
-            System.out.println("[GUI] No actions found for player " + player.getName() + " slot " + slot);
         }
     }
 
@@ -73,8 +67,6 @@ public class PlayerGuiManager implements Listener {
         event.setCancelled(true);
 
         int slot = event.getSlot();
-        System.out.println("[GUI] Player " + player.getName() + " clicked slot " + slot +
-                " with " + event.getClick() + " (current item: " + event.getCurrentItem() + ")");
 
         runSlotActions(player, slot, false);
     }
@@ -87,7 +79,12 @@ public class PlayerGuiManager implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             ItemStack item = event.getItem();
             if (item != null && event.getHand() != null) {
-                int slot = event.getHand().ordinal();
+                int slot;
+                if (event.getHand() == EquipmentSlot.HAND) {
+                    slot = player.getInventory().getHeldItemSlot();
+                } else {
+                    slot = 40;
+                }
                 runSlotActions(player, slot, false);
             }
             event.setCancelled(true);

@@ -48,12 +48,15 @@ public class GameHandler {
             game.gamePlayers.get(player).setBeacon2(destinationCard.pointB.x() + destinationCard.pointB.width() / 2, destinationCard.pointB.y() + destinationCard.pointB.height() / 2);
         }));
 
+        int toggleSlot = slot + 1;
         ItemStack item = new ItemStack(Material.YELLOW_CONCRETE);
-        actionManager.addAction(inventory, item, slot, GuiAction.ofClick(() -> {
-            if (List.of(Material.RED_CONCRETE, Material.YELLOW_CONCRETE).contains(item.getType())) {
-                inventory.setItem(slot, item.withType(Material.RED_CONCRETE));
-            } else if (item.getType().equals(Material.RED_CONCRETE)) {
-                inventory.setItem(slot, item.withType(Material.LIME_CONCRETE));
+        actionManager.addAction(inventory, item, toggleSlot, GuiAction.ofClick(() -> {
+            ItemStack stack = inventory.getItem(toggleSlot);
+            if (stack == null) return;
+            if (List.of(Material.LIME_CONCRETE, Material.YELLOW_CONCRETE).contains(stack.getType())) {
+                inventory.setItem(toggleSlot, stack.withType(Material.RED_CONCRETE));
+            } else if (stack.getType().equals(Material.RED_CONCRETE)) {
+                inventory.setItem(toggleSlot, stack.withType(Material.LIME_CONCRETE));
             }
         }));
     }
