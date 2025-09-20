@@ -1,9 +1,11 @@
 package avox.test.ticketToRide.guis;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -73,22 +75,23 @@ public class PlayerGuiManager implements Listener {
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        if (!isRegistered(player)) return;
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (!isRegistered(event.getPlayer())) return;
 
-        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            ItemStack item = event.getItem();
-            if (item != null && event.getHand() != null) {
-                int slot;
-                if (event.getHand() == EquipmentSlot.HAND) {
-                    slot = player.getInventory().getHeldItemSlot();
-                } else {
-                    slot = 40;
-                }
-                runSlotActions(player, slot, false);
-            }
-            event.setCancelled(true);
+        Action action = event.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) return;
+
+        if (action == Action.RIGHT_CLICK_BLOCK) {
+            if (event.useInteractedBlock() == Event.Result.DENY) return;
         }
+
+        ItemStack item = event.getItem();
+        if (item == null) return;
+
+        int slot = event.getPlayer().getInventory().getHeldItemSlot();
+        runSlotActions(event.getPlayer(), slot, false);
+
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -107,7 +110,7 @@ public class PlayerGuiManager implements Listener {
         Player player = (Player) event.getPlayer();
         if (!isRegistered(player)) return;
 
-        if (playerInventories.get(player).hotbarOnly) {
+        if (!playerInventories.get(player).hotbarOnly) {
             playerInventories.remove(player);
             playerActions.remove(player);
         }

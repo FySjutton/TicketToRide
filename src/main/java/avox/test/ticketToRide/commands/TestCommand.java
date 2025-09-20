@@ -47,8 +47,8 @@ public class TestCommand {
                             GameMap map = game.gameMap;
                             Arena arena = game.arena;
 
-                            City a = map.getRandomCity();
-                            City b = map.getRandomCity();
+                            City a = map.getRandomCity(false);
+                            City b = map.getRandomCity(false);
 
                             System.out.println("heer");
                             RewardCalculator rewardCalculator = new RewardCalculator();

@@ -77,7 +77,7 @@ public class MapManager {
         JsonObject cities = data.getAsJsonObject("cities");
         for (String city : cities.keySet()) {
             JsonObject cityJson = cities.getAsJsonObject(city);
-            map.cities.add(new City(
+            map.allCities.add(new City(
                 city,
                 cityJson.get("height").getAsInt(),
                 cityJson.get("width").getAsInt(),
@@ -86,6 +86,7 @@ public class MapManager {
                 cityJson.get("type").getAsString().equals("city")
             ));
         }
+        map.cities = new ArrayList<>(map.allCities.stream().filter(City::city).toList());
 
         JsonArray routes = data.getAsJsonArray("routes");
         for (JsonElement jsonRoute : routes) {

@@ -1,6 +1,7 @@
 package avox.test.ticketToRide.game;
 
 import avox.test.ticketToRide.config.ArenaManager;
+import avox.test.ticketToRide.game.gameHandler.GameHandler;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.renderer.MapSummoner;
 import avox.test.ticketToRide.utils.BillboardManager;

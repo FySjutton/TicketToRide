@@ -16,7 +16,9 @@ public class GameMap {
 
     public File map;
 
-    public ArrayList<City> cities = new ArrayList<>();
+    public ArrayList<City> cities;
+    public ArrayList<City> allCities = new ArrayList<>();
+
     public ArrayList<Color> colors = new ArrayList<>();
     public ArrayList<Route> routes = new ArrayList<>();
     public HashMap<Integer, TileMap> tileMaps = new HashMap<>();
@@ -46,7 +48,7 @@ public class GameMap {
     }
 
     public City getCity(String name) {
-        return cities.stream().filter(city -> city.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return allCities.stream().filter(city -> city.name().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     public Color getColor(String name) {
@@ -57,7 +59,10 @@ public class GameMap {
         return arena.mapStartPosition.clone().add((double) ((tilesX * 128 - width) / 2) / 128, 0, (double) ((tilesY * 128 -height) / 2) / 128);
     }
 
-    public City getRandomCity() {
+    public City getRandomCity(boolean includeSubCities) {
+        if (includeSubCities) {
+            return allCities.get(new Random().nextInt(0, allCities.size()));
+        }
         return cities.get(new Random().nextInt(0, cities.size()));
     }
 

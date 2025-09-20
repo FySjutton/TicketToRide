@@ -6,7 +6,7 @@ public class RewardCalculator {
     private Map<City, List<Route>> buildGraph(GameMap gameMap) {
         List<Route> routes = gameMap.routes.stream().map(route -> new Route(route.point_a, route.point_b, route.length)).toList();
         Map<City, List<Route>> graph = new HashMap<>();
-        for (City city : gameMap.cities) graph.put(city, new ArrayList<>());
+        for (City city : gameMap.allCities) graph.put(city, new ArrayList<>());
         for (Route route : routes) {
             graph.get(route.point_a).add(route);
             graph.get(route.point_b).add(new Route(route.point_b, route.point_a, route.length));
@@ -18,7 +18,7 @@ public class RewardCalculator {
         if (start == goal) return 0;
 
         Map<City, Integer> dist = new HashMap<>();
-        for (City c : gameMap.cities) dist.put(c, Integer.MAX_VALUE);
+        for (City c : gameMap.allCities) dist.put(c, Integer.MAX_VALUE);
         dist.put(start, 0);
 
         PriorityQueue<City> pq = new PriorityQueue<>(Comparator.comparingInt(dist::get));

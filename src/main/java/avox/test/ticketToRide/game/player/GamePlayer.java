@@ -29,6 +29,7 @@ public class GamePlayer {
 
     public ItemDisplay beacon1;
     public ItemDisplay beacon2;
+    public int beaconSlot;
 
     public ArrayList<DestinationCard> destinationCards = new ArrayList<>();
 
@@ -52,12 +53,10 @@ public class GamePlayer {
             )
     );
 
-    public void setBeacon1(int x, int y) {
-        beacon1 = setBeacon(x, y, beacon1);
-    }
-
-    public void setBeacon2(int x, int y) {
-        beacon2 = setBeacon(x, y, beacon2);
+    public void setBeacons(int slot, int x1, int y1, int x2, int y2) {
+        beaconSlot = slot;
+        beacon1 = setBeacon(x1, y1, beacon1);
+        beacon2 = setBeacon(x2, y2, beacon2);
     }
 
     public void clearBeacons() {
@@ -69,6 +68,7 @@ public class GamePlayer {
         }
         beacon1 = null;
         beacon2 = null;
+        beaconSlot = -1;
     }
 
     private ItemDisplay setBeacon(int x, int y, ItemDisplay beacon) {
