@@ -36,6 +36,7 @@ public class MainCommand {
                         if (!(ctx.getSource().getExecutor() instanceof Player)) return 0;
                         Player sender = (Player) ctx.getSource().getSender();
                         if (!GameManager.activePlayers.contains(sender)) {
+                            // Todo: Autoselect maps / arena if there's only one available / installed
                             SelectObjectGui<GameMap> mapGui = new SelectObjectGui<>(sender, Component.text("Choose Map"));
                             ArrayList<SelectObjectGui<GameMap>.ObjectEntry> options = new ArrayList<>(maps.stream().map(map -> mapGui.new ObjectEntry(getYellow(map.name), getGray(map.description), map.headTexture, map)).toList());
                             if (options.isEmpty()) {
@@ -137,9 +138,7 @@ public class MainCommand {
                                         } else if (game.invites.contains(sender)) {
                                             game.invites.remove(sender);
                                             game.addPlayer(sender);
-                                            for (GamePlayer player : game.gamePlayers.values()) {
-                                                player.player.sendMessage("§e" + sender.getName() + "§a joined the game!");
-                                            }
+                                            game.broadcast("§e" + sender.getName() + "§a joined the game!");
                                             return 1;
                                         }
                                     }
@@ -161,9 +160,7 @@ public class MainCommand {
                                         if (game.invites.contains(sender)) {
                                             game.invites.remove(sender);
                                             sender.sendMessage("&cYou declined the T2R game invitation.");
-                                            for (GamePlayer player : game.gamePlayers.values()) {
-                                                player.player.sendMessage("§e" + sender.getName() + " §cdeclined the invitation to the game!");
-                                            }
+                                            game.broadcast("§e" + sender.getName() + " §cdeclined the invitation to the game!");
                                             return 1;
                                         }
                                     }

@@ -50,9 +50,7 @@ public class PlayerHandlerListener implements Listener {
             pendingLeaves.remove(player);
             Game game = GameManager.getGameByUser(player);
             if (game != null) {
-                for (Player gamePlayer : game.gamePlayers.keySet()) {
-                    gamePlayer.sendMessage("§a" + player.getName() + " rejoined!");
-                }
+                game.broadcast("§a" + player.getName() + " rejoined!");
             }
         }
     }
@@ -124,9 +122,7 @@ public class PlayerHandlerListener implements Listener {
                     game.leaveGame(event.getPlayer());
                 } else {
                     pendingLeaves.put(event.getPlayer(), System.currentTimeMillis());
-                    for (Player player : game.gamePlayers.keySet()) {
-                        player.sendMessage("§e" + event.getPlayer().getName() + "§c left the server!\n§7They have one minute to rejoin before being kicked from the game!");
-                    }
+                    game.broadcast("§e" + event.getPlayer().getName() + "§c left the server!\n§7They have one minute to rejoin before being kicked from the game!");
                 }
             }
         }

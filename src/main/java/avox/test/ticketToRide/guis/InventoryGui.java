@@ -12,9 +12,9 @@ public class InventoryGui {
     public final Inventory gui;
     public final ActionManager actionManager = new ActionManager();
 
-    public InventoryGui(Player player, int size, Component name) {
+    public InventoryGui(Player player, int size, Component name, PlayerGuiManager.PlayerEntry onClose) {
         gui = Bukkit.createInventory(null, size, name);
-        PlayerGuiManager.createGui(gui, player, actionManager, false);
+        PlayerGuiManager.createGui(gui, player, actionManager, false, onClose);
     }
 
     public Inventory getInventory() {

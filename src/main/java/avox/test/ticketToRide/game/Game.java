@@ -66,11 +66,9 @@ public class Game {
             gamePlayer.marker.remove();
         }
 
-        for (Player user : gamePlayers.keySet()) {
-            user.sendMessage("§e" + player.getName() + " §cleft the game!");
-            if (player == gameOwner) {
-                user.sendMessage("§cThe host left the game!");
-            }
+        broadcast("§e" + player.getName() + " §cleft the game!");
+        if (player == gameOwner) {
+            broadcast("§cThe host left the game!");
         }
         player.sendMessage("§cYou left the game!");
 
@@ -86,9 +84,19 @@ public class Game {
 
         if (player == gameOwner) {
             GameManager.changeOwner(this, gamePlayers.keySet().stream().toList().get(new Random().nextInt(0, gamePlayers.size())));
-            for (Player user : gamePlayers.keySet()) {
-                user.sendMessage("§e" + gameOwner.getName() + "§7 is now the host of this game!");
-            }
+            broadcast("§e" + gameOwner.getName() + "§7 is now the host of this game!");
+        }
+    }
+
+    public void broadcast(String message) {
+        for (Player player : gamePlayers.keySet()) {
+            player.sendMessage(message);
+        }
+    }
+
+    public void broadcast(Component message) {
+        for (Player player : gamePlayers.keySet()) {
+            player.sendMessage(message);
         }
     }
 }

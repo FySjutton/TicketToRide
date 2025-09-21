@@ -5,7 +5,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -21,31 +20,31 @@ import java.util.Map;
 import java.util.ArrayList;
 
 public class PlayerGuiManager implements Listener {
-    private static final Map<Player, GuiInventory> playerInventories = new HashMap<>();
-    private static final Map<Player, Map<Integer, ArrayList<GuiAction>>> playerActions = new HashMap<>();
+    private static final HashMap<Player, PlayerEntry> entries = new HashMap<>();
 
-    public static void createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly) {
-        playerInventories.put(player, new GuiInventory(inventory, hotbarOnly));
-        playerActions.put(player, slotActions.actions);
+    public record PlayerEntry(Player player, GuiInventory inventory, Map<Integer, ArrayList<GuiAction>> actions, PlayerEntry onCloseEntry) {}
+
+    public static void createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly, PlayerEntry onCloseEntry) {
+        entries.put(player, new PlayerEntry(player, new GuiInventory(inventory, hotbarOnly), slotActions.actions, onCloseEntry));
     }
 
-    public static class GuiInventory {
-        public Inventory inventory;
-        public boolean hotbarOnly;
-
-        public GuiInventory(Inventory inventory, boolean hotbarOnly) {
-            this.inventory = inventory;
-            this.hotbarOnly = hotbarOnly;
-        }
+    public static PlayerEntry getGui(Player player) {
+        return entries.get(player);
     }
+
+    public static void removeGui(Player player) {
+        entries.remove(player);
+    }
+
+    public record GuiInventory(Inventory inventory, boolean hotbarOnly) {}
 
     // --- Helper methods ---
     private boolean isRegistered(Player player) {
-        return playerInventories.containsKey(player);
+        return entries.containsKey(player);
     }
 
     private void runSlotActions(Player player, int slot, boolean runHoldAction) {
-        Map<Integer, ArrayList<GuiAction>> actions = playerActions.get(player);
+        Map<Integer, ArrayList<GuiAction>> actions = entries.get(player).actions;
         if (actions != null && actions.containsKey(slot)) {
             for (GuiAction action : actions.get(slot)) {
                 if (runHoldAction && action.holdAction != null) {
@@ -63,7 +62,7 @@ public class PlayerGuiManager implements Listener {
         Player player = (Player) event.getWhoClicked();
         if (!isRegistered(player)) return;
 
-        Inventory gui = playerInventories.get(player).inventory;
+        Inventory gui = entries.get(player).inventory.inventory;
         if (!event.getInventory().equals(gui)) return;
 
         event.setCancelled(true);
@@ -98,7 +97,7 @@ public class PlayerGuiManager implements Listener {
     public void onInventoryDrag(InventoryDragEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (!isRegistered(player)) return;
-        Inventory gui = playerInventories.get(player).inventory;
+        Inventory gui = entries.get(player).inventory.inventory;
 
         if (event.getInventory().equals(gui)) {
             event.setCancelled(true);
@@ -110,9 +109,13 @@ public class PlayerGuiManager implements Listener {
         Player player = (Player) event.getPlayer();
         if (!isRegistered(player)) return;
 
-        if (!playerInventories.get(player).hotbarOnly) {
-            playerInventories.remove(player);
-            playerActions.remove(player);
+        PlayerEntry entry = entries.get(player);
+        if (!entry.inventory.hotbarOnly) {
+            if (entry.onCloseEntry != null) {
+                entries.put(player, entry.onCloseEntry);
+            } else {
+                entries.remove(player);
+            }
         }
     }
 

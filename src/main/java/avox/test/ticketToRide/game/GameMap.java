@@ -19,7 +19,8 @@ public class GameMap {
     public ArrayList<City> cities;
     public ArrayList<City> allCities = new ArrayList<>();
 
-    public ArrayList<Color> colors = new ArrayList<>();
+    public MapColor wildCard;
+    public ArrayList<MapColor> colors = new ArrayList<>();
     public ArrayList<Route> routes = new ArrayList<>();
     public HashMap<Integer, TileMap> tileMaps = new HashMap<>();
     public HashMap<Integer, PointSquare> pointBoard = new HashMap<>();
@@ -34,7 +35,7 @@ public class GameMap {
     public int pointBoardSize;
     public String headTexture;
 
-    public GameMap(String name, String description, File map, String version, int height, int width, int tilesX, int tilesY, int pointBoardSize, String headTexture) {
+    public GameMap(String name, String description, File map, String version, int height, int width, int tilesX, int tilesY, int pointBoardSize, String headTexture, MapColor wildCard) {
         this.name = name;
         this.description = description;
         this.map = map;
@@ -45,14 +46,15 @@ public class GameMap {
         this.tilesY = tilesY;
         this.pointBoardSize = pointBoardSize;
         this.headTexture = headTexture;
+        this.wildCard = wildCard;
+    }
+
+    public MapColor getColor(String color) {
+        return colors.stream().filter(c -> c.name.equalsIgnoreCase(color)).findFirst().orElse(null);
     }
 
     public City getCity(String name) {
         return allCities.stream().filter(city -> city.name().equalsIgnoreCase(name)).findFirst().orElse(null);
-    }
-
-    public Color getColor(String name) {
-        return colors.stream().filter(color -> color.color.equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     public Location getStartLocation(Arena arena) {
@@ -65,8 +67,6 @@ public class GameMap {
         }
         return cities.get(new Random().nextInt(0, cities.size()));
     }
-
-    public record Color(String color, Material material) {}
 
     public static class TileMap {
         public ArrayList<LineMap> lines = new ArrayList<>();

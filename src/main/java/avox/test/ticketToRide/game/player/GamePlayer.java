@@ -3,7 +3,7 @@ package avox.test.ticketToRide.game.player;
 import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.game.DestinationCard;
 import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.utils.board.MarkerManager;
+import avox.test.ticketToRide.game.MapColor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -23,8 +23,8 @@ public class GamePlayer {
     public ItemDisplay marker;
     public Pair<Color, Material> markerData;
 
-
-    public int points = -1; // Changes to 0 when game is started
+    public LinkedHashMap<MapColor, Integer> cards = new LinkedHashMap<>();
+    public int points = 0;
     public int trains = 45;
 
     public ItemDisplay beacon1;
@@ -41,6 +41,9 @@ public class GamePlayer {
         List<Pair<Color, Material>> validOptions = new ArrayList<>(markerColors.stream().filter(color -> !usedColors.contains(color)).toList());
         Collections.shuffle(validOptions);
         this.markerData = validOptions.getFirst();
+
+        game.gameMap.colors.forEach(map -> cards.put(map, 0));
+        cards.put(game.gameMap.wildCard, 0);
     }
 
     private static final ArrayList<Pair<Color, Material>> markerColors = new ArrayList<>(

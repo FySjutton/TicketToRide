@@ -6,6 +6,7 @@ import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.guis.ActionManager;
 import avox.test.ticketToRide.guis.GuiAction;
 import avox.test.ticketToRide.guis.GuiTools;
+import avox.test.ticketToRide.guis.PlayerGuiManager;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,17 +27,21 @@ public final class DestinationHandler {
         this.gameHandler = gameHandler;
     }
 
-    public void chooseDestinationCards(Game game, Player player, int minimumAccepts, Consumer<List<DestinationCard>> finishedAction) {
+    public void chooseDestinationCards(Game game, Player player, int minimumAccepts) {
+        chooseDestinationCards(game, player, minimumAccepts, 3);
+    }
+
+    public void chooseDestinationCards(Game game, Player player, int minimumAccepts, int maximumAccepts) {
         ActionManager actionManager = new ActionManager();
-        DestinationSelectionAction state = new DestinationSelectionAction(player, actionManager);
+        DestinationSelectionAction state = new DestinationSelectionAction(game, player, actionManager);
         gameHandler.playerStateManager.put(player, state);
 
         PlayerInventory inventory = player.getInventory();
         inventory.setHeldItemSlot(0);
 
-        setDestinationCard(game, state, player, inventory, 1, minimumAccepts);
-        setDestinationCard(game, state, player, inventory, 3, minimumAccepts);
-        setDestinationCard(game, state, player, inventory, 5, minimumAccepts);
+        setDestinationCard(game, state, inventory, 1, minimumAccepts, maximumAccepts);
+        setDestinationCard(game, state, inventory, 3, minimumAccepts, maximumAccepts);
+        setDestinationCard(game, state, inventory, 5, minimumAccepts, maximumAccepts);
 
         for (int slot : List.of(0, 7, 8)) {
             actionManager.addAction(slot, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
@@ -44,8 +50,8 @@ public final class DestinationHandler {
         actionManager.addAction(
                 inventory,
                 GuiTools.format(
-                        new ItemStack(Material.RED_CONCRETE),
-                        GuiTools.colorize("Finished!", NamedTextColor.RED)
+                    new ItemStack(Material.RED_CONCRETE),
+                    GuiTools.colorize("Finished!", NamedTextColor.RED)
                 ),
                 8,
                 GuiAction.ofClick(() -> {
@@ -54,13 +60,14 @@ public final class DestinationHandler {
                     if (stack.getType().equals(Material.RED_CONCRETE)) {
                         player.sendMessage(state.error);
                     } else {
-                        finishedAction.accept(state.toggles.keySet().stream().filter(state.toggles::get).toList());
+                        List<DestinationCard> acceptedCards = state.toggles.keySet().stream().filter(state.toggles::get).toList();
+                        finished(game, player, state, acceptedCards);
                     }
                 })
         );
     }
 
-    private void setDestinationCard(Game game, DestinationSelectionAction state, Player player, Inventory inventory, int slot, int minimumAccepts) {
+    private void setDestinationCard(Game game, DestinationSelectionAction state, Inventory inventory, int slot, int minimumAccepts, int maximumAccepts) {
         DestinationCard card = DestinationCard.getDestinationCard(game.gameMap);
         int toggleSlot = slot + 1;
 
@@ -73,17 +80,17 @@ public final class DestinationHandler {
                 GuiTools.getYellow(card.pointA.name() + " - " + card.pointB.name() + " (" + card.reward + " points)")
         );
         state.actionManager.addAction(inventory, mainItem, slot, GuiAction.ofHold(() -> beaconHolder(state.player, toggleSlot, card)));
-        state.actionManager.addAction(slot, GuiAction.ofClick(() -> toggleCard(state, inventory, player, toggleSlot, card, minimumAccepts)));
+        state.actionManager.addAction(slot, GuiAction.ofClick(() -> toggleCard(state, inventory, toggleSlot, card, minimumAccepts, maximumAccepts)));
 
         ItemStack toggleItem = GuiTools.format(
                 new ItemStack(Material.YELLOW_CONCRETE),
                 GuiTools.getYellow("Click to toggle")
         );
-        state.actionManager.addAction(inventory, toggleItem, toggleSlot, GuiAction.ofClick(() -> toggleCard(state, inventory, player, toggleSlot, card, minimumAccepts)));
+        state.actionManager.addAction(inventory, toggleItem, toggleSlot, GuiAction.ofClick(() -> toggleCard(state, inventory, toggleSlot, card, minimumAccepts, maximumAccepts)));
         state.actionManager.addAction(toggleSlot, GuiAction.ofHold(() -> beaconHolder(state.player, slot, card)));
     }
 
-    private void toggleCard(DestinationSelectionAction state, Inventory inventory, Player player, int slot, DestinationCard card, int minimumAccepts) {
+    private void toggleCard(DestinationSelectionAction state, Inventory inventory, int slot, DestinationCard card, int minimumAccepts, int maximumAccepts) {
         if (card == null) return;
 
         ItemStack stack = inventory.getItem(slot);
@@ -107,19 +114,31 @@ public final class DestinationHandler {
 
         ItemStack finishBtn = inventory.getItem(8);
         if (finishBtn == null) return;
+        boolean success = false;
         if (state.toggles.size() == 3) {
             int amountAccepted = state.toggles.values().stream().filter(i -> i).toList().size();
             if (amountAccepted < minimumAccepts) {
                 state.error = "§cYou must accept at least " + minimumAccepts + "!";
-                inventory.setItem(8, GuiTools.format(finishBtn.withType(Material.RED_CONCRETE), GuiTools.colorize("Finished!", NamedTextColor.RED)));
+            } else if (amountAccepted > maximumAccepts) {
+                state.error = "§cYou must accept no more than " + maximumAccepts + "!";
             } else {
                 state.error = "";
-                inventory.setItem(8, GuiTools.format(finishBtn.withType(Material.LIME_CONCRETE), GuiTools.colorize("Finished!", NamedTextColor.GREEN)));
+                success = true;
             }
         } else {
             state.error = "§cYou must toggle all!";
-            inventory.setItem(8, GuiTools.format(finishBtn.withType(Material.RED_CONCRETE), GuiTools.colorize("Finished!", NamedTextColor.RED)));
         }
+        inventory.setItem(8, GuiTools.format(finishBtn.withType(success ? Material.LIME_CONCRETE : Material.RED_CONCRETE), GuiTools.colorize("Finished!", success ? NamedTextColor.GREEN : NamedTextColor.RED)));
+    }
+
+    private static void finished(Game game, Player player, DestinationSelectionAction state, List<DestinationCard> acceptedCards) {
+        PlayerGuiManager.removeGui(player);
+        for (int i = 0; i < 9; i++) {
+            player.getInventory().setItem(i, null);
+        }
+        game.gamePlayers.get(player).destinationCards.addAll(acceptedCards);
+        state.finished = true;
+        game.gameHandler.setDefaultHotbar(player);
     }
 
     private void beaconHolder(Player player, int slot, DestinationCard card) {
@@ -138,12 +157,15 @@ public final class DestinationHandler {
     public static class DestinationSelectionAction extends GameHandler.PlayerState {
         public final Map<DestinationCard, Boolean> toggles = new HashMap<>();
         public final Map<Integer, DestinationCard> cardSlots = new HashMap<>();
-        public final ActionManager actionManager;
         public String error = "§cYou must toggle all!";
 
-        public DestinationSelectionAction(Player player, ActionManager actionManager) {
-            super(player, actionManager);
-            this.actionManager = actionManager;
+        public DestinationSelectionAction(Game game, Player player, ActionManager actionManager) {
+            super(game, player, actionManager);
+        }
+
+        @Override
+        public void timeOut() {
+            finished(game, player, this, cardSlots.values().stream().toList());
         }
     }
 }

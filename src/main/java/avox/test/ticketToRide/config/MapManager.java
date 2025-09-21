@@ -2,11 +2,16 @@ package avox.test.ticketToRide.config;
 
 import avox.test.ticketToRide.game.City;
 import avox.test.ticketToRide.game.GameMap;
+import avox.test.ticketToRide.game.MapColor;
 import avox.test.ticketToRide.game.Route;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 
 import java.io.File;
@@ -66,12 +71,13 @@ public class MapManager {
             data.get("map_x").getAsInt(),
             data.get("map_y").getAsInt(),
             data.get("point_board_size").getAsInt(),
-            data.get("head_texture").getAsString()
+            data.get("head_texture").getAsString(),
+            new MapColor("wildcard", Material.valueOf(data.get("wildcard").getAsString().toUpperCase()), MapColor.coloredTextFromString("wildcard", true))
         );
 
         JsonObject colors = data.getAsJsonObject("colors");
         for (Map.Entry<String, JsonElement> color : colors.asMap().entrySet()) {
-            map.colors.add(new GameMap.Color(color.getKey(), Material.valueOf(color.getValue().getAsString().toUpperCase())));
+            map.colors.add(new MapColor(color.getKey(), Material.valueOf(color.getValue().getAsString().toUpperCase()), MapColor.coloredTextFromString(color.getKey(), false)));
         }
 
         JsonObject cities = data.getAsJsonObject("cities");
