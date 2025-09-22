@@ -28,7 +28,7 @@ public class GameHandler {
     protected Game game;
     protected HashMap<Player, PlayerState> playerStateManager = new HashMap<>();
 
-    private final DestinationHandler destinationHandler = new DestinationHandler(this);
+    public final DestinationHandler destinationHandler = new DestinationHandler(this);
     private final TimerManager timerManager = new TimerManager(this);
 
     public GameHandler(Game game) {
@@ -45,14 +45,20 @@ public class GameHandler {
     }
 
     public void setDefaultHotbar(Player player) {
-        PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.getGui(player);
+        clearHotbar(player);
         ActionManager actionManager = new ActionManager();
-        PlayerGuiManager.createGui(player.getInventory(), player, actionManager, true, null);
+        PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.createGui(player.getInventory(), player, actionManager, true, null);
 
-        actionManager.addAction(player.getInventory(), GuiTools.format(new ItemStack(Material.COMPASS), GuiTools.getYellow("Show Info")), 8, GuiAction.ofClick(() -> {
+        actionManager.addAction(player.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Show Info")), 8, GuiAction.ofClick(() -> {
             ViewInfo viewInfo = new ViewInfo(game, player, oldEntry);
             player.openInventory(viewInfo.gui);
         }));
+    }
+
+    public void clearHotbar(Player player) {
+        for (int i = 0; i < 9; i++) {
+            player.getInventory().setItem(i, null);
+        }
     }
 
     public static abstract class PlayerState {

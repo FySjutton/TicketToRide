@@ -21,11 +21,11 @@ public class GamePlayer {
     public Player player;
     public Game game;
     public ItemDisplay marker;
-    public Pair<Color, Material> markerData;
+    public MapColor markerData;
 
     public LinkedHashMap<MapColor, Integer> cards = new LinkedHashMap<>();
-    public int points = 0;
-    public int trains = 45;
+    public int points = -1;
+    public int trains;
 
     public ItemDisplay beacon1;
     public ItemDisplay beacon2;
@@ -37,8 +37,8 @@ public class GamePlayer {
         this.player = player;
         this.game = game;
 
-        List<Pair<Color, Material>> usedColors = game.gamePlayers.values().stream().map(p -> p.markerData).toList();
-        List<Pair<Color, Material>> validOptions = new ArrayList<>(markerColors.stream().filter(color -> !usedColors.contains(color)).toList());
+        List<MapColor> usedColors = game.gamePlayers.values().stream().map(p -> p.markerData).toList();
+        List<MapColor> validOptions = new ArrayList<>(markerColors.stream().filter(color -> !usedColors.contains(color)).toList());
         Collections.shuffle(validOptions);
         this.markerData = validOptions.getFirst();
 
@@ -46,13 +46,13 @@ public class GamePlayer {
         cards.put(game.gameMap.wildCard, 0);
     }
 
-    private static final ArrayList<Pair<Color, Material>> markerColors = new ArrayList<>(
+    private static final ArrayList<MapColor> markerColors = new ArrayList<>(
             List.of(
-                    Pair.of(Color.BLUE, Material.BLUE_CONCRETE),
-                    Pair.of(Color.GREEN, Material.GREEN_CONCRETE),
-                    Pair.of(Color.RED, Material.RED_CONCRETE),
-                    Pair.of(Color.PURPLE, Material.PURPLE_CONCRETE),
-                    Pair.of(Color.YELLOW, Material.YELLOW_CONCRETE)
+                    new MapColor("blue", Material.BLUE_CONCRETE),
+                    new MapColor("green", Material.GREEN_CONCRETE),
+                    new MapColor("red", Material.RED_CONCRETE),
+                    new MapColor("purple", Material.PURPLE_CONCRETE),
+                    new MapColor("yellow", Material.YELLOW_CONCRETE)
             )
     );
 

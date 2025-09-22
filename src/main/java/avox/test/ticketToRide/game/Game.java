@@ -26,7 +26,7 @@ public class Game {
     public HashMap<Player, GamePlayer> gamePlayers = new HashMap<>();
     public ArrayList<Player> invites = new ArrayList<>();
 
-    private TextDisplay infoText;
+    public TextDisplay infoText;
     private int infoTextStep = 1; // 1: not enough players, 2: start info
 
     public Game(Player gameOwner, Arena arena, GameMap gameMap) {

@@ -32,10 +32,11 @@ public class GameMap {
     public int tilesX;
     public int tilesY;
 
+    public int startingTrains;
     public int pointBoardSize;
     public String headTexture;
 
-    public GameMap(String name, String description, File map, String version, int height, int width, int tilesX, int tilesY, int pointBoardSize, String headTexture, MapColor wildCard) {
+    public GameMap(String name, String description, File map, String version, int height, int width, int tilesX, int tilesY, int pointBoardSize, int startingTrains, String headTexture, MapColor wildCard) {
         this.name = name;
         this.description = description;
         this.map = map;
@@ -45,6 +46,7 @@ public class GameMap {
         this.tilesX = tilesX;
         this.tilesY = tilesY;
         this.pointBoardSize = pointBoardSize;
+        this.startingTrains = startingTrains;
         this.headTexture = headTexture;
         this.wildCard = wildCard;
     }

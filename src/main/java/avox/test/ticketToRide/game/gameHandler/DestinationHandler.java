@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,32 @@ public final class DestinationHandler {
 
     public DestinationHandler(GameHandler gameHandler) {
         this.gameHandler = gameHandler;
+    }
+
+    public void viewDestinationCards(List<DestinationCard> cards, Game game, Player player) {
+        player.closeInventory();
+        ActionManager actionManager = new ActionManager();
+        Inventory inventory = player.getInventory();
+        PlayerGuiManager.createGui(inventory, player, actionManager, true, null);
+        gameHandler.clearHotbar(player);
+
+        for (int i = 0; i < cards.size(); i++) {
+            DestinationCard card = cards.get(i);
+            int finalI = i;
+            actionManager.addAction(inventory, GuiTools.format(
+                    new ItemStack(Material.NAME_TAG),
+                    GuiTools.getYellow(card.pointA.name() + " - " + card.pointB.name() + " (" + card.reward + " points)")
+            ), i, GuiAction.ofHold(() -> beaconHolder(player, finalI, card)));
+        }
+
+        for (int i = cards.size(); i < 9; i++) {
+            actionManager.addAction(i, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
+        }
+
+        actionManager.addAction(inventory, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Return")), 8, GuiAction.ofClick(() -> {
+            PlayerGuiManager.removeGui(player);
+            gameHandler.setDefaultHotbar(player);
+        }));
     }
 
     public void chooseDestinationCards(Game game, Player player, int minimumAccepts) {
@@ -73,7 +100,6 @@ public final class DestinationHandler {
 
         state.cardSlots.put(slot, card);
         state.cardSlots.put(toggleSlot, card);
-//        state.toggles.put(card, false);
 
         ItemStack mainItem = GuiTools.format(
                 new ItemStack(Material.NAME_TAG),
@@ -165,7 +191,7 @@ public final class DestinationHandler {
 
         @Override
         public void timeOut() {
-            finished(game, player, this, cardSlots.values().stream().toList());
+            finished(game, player, this, cardSlots.values().stream().distinct().toList());
         }
     }
 }

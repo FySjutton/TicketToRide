@@ -24,8 +24,10 @@ public class PlayerGuiManager implements Listener {
 
     public record PlayerEntry(Player player, GuiInventory inventory, Map<Integer, ArrayList<GuiAction>> actions, PlayerEntry onCloseEntry) {}
 
-    public static void createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly, PlayerEntry onCloseEntry) {
-        entries.put(player, new PlayerEntry(player, new GuiInventory(inventory, hotbarOnly), slotActions.actions, onCloseEntry));
+    public static PlayerEntry createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly, PlayerEntry onCloseEntry) {
+        PlayerEntry entry = new PlayerEntry(player, new GuiInventory(inventory, hotbarOnly), slotActions.actions, onCloseEntry);
+        entries.put(player, entry);
+        return entry;
     }
 
     public static PlayerEntry getGui(Player player) {
@@ -33,7 +35,14 @@ public class PlayerGuiManager implements Listener {
     }
 
     public static void removeGui(Player player) {
-        entries.remove(player);
+        PlayerEntry entry = entries.get(player);
+        if (entry != null) {
+            if (entry.onCloseEntry != null) {
+                entries.put(player, entry.onCloseEntry);
+            } else {
+                entries.remove(player);
+            }
+        }
     }
 
     public record GuiInventory(Inventory inventory, boolean hotbarOnly) {}

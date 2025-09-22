@@ -8,6 +8,7 @@ public class DestinationCard {
     public City pointA;
     public City pointB;
     public int reward;
+    public boolean finished = false;
 
     public DestinationCard(City pointA, City pointB, int reward) {
         this.pointA = pointA;

@@ -9,6 +9,8 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Base64;
 import java.util.List;
@@ -61,5 +63,14 @@ public class GuiTools {
 
     public static Component getGray(String text) {
         return colorize(text, NamedTextColor.GRAY);
+    }
+
+    public static ItemStack clearCompass(ItemStack stack) {
+        ItemMeta meta = stack.getItemMeta();
+        if (meta instanceof CompassMeta compassMeta) {
+            compassMeta.clearLodestone();
+        }
+        stack.setItemMeta(meta);
+        return stack;
     }
 }

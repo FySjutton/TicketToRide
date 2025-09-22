@@ -6,6 +6,7 @@ import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.renderer.MapSummoner;
 import avox.test.ticketToRide.utils.BillboardManager;
 import avox.test.ticketToRide.utils.board.MarkerManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -52,16 +53,18 @@ public class GameManager {
     public static void startGame(Game game) {
         game.started = true;
         game.gameHandler = new GameHandler(game);
+        game.infoText.text(Component.empty());
 
         MarkerManager markerManager = new MarkerManager();
         for (GamePlayer player : game.gamePlayers.values()) {
-            player.player.getInventory().setBoots(setLeatherColor(new ItemStack(Material.LEATHER_BOOTS), player.markerData.getLeft()));
-            player.player.getInventory().setLeggings(setLeatherColor(new ItemStack(Material.LEATHER_LEGGINGS), player.markerData.getLeft()));
-            player.player.getInventory().setChestplate(setLeatherColor(new ItemStack(Material.LEATHER_CHESTPLATE), player.markerData.getLeft()));
-            player.player.getInventory().setHelmet(setLeatherColor(new ItemStack(Material.LEATHER_HELMET), player.markerData.getLeft()));
+            player.player.getInventory().setBoots(setLeatherColor(new ItemStack(Material.LEATHER_BOOTS), player.markerData.color));
+            player.player.getInventory().setLeggings(setLeatherColor(new ItemStack(Material.LEATHER_LEGGINGS), player.markerData.color));
+            player.player.getInventory().setChestplate(setLeatherColor(new ItemStack(Material.LEATHER_CHESTPLATE), player.markerData.color));
+            player.player.getInventory().setHelmet(setLeatherColor(new ItemStack(Material.LEATHER_HELMET), player.markerData.color));
 
-            player.marker = markerManager.spawnMarker(game, player.markerData.getRight());
+            player.marker = markerManager.spawnMarker(game, player.markerData.material);
             player.points = 0;
+            player.trains = game.gameMap.startingTrains;
             markerManager.reposition(game, player, player.points);
         }
     }

@@ -36,8 +36,10 @@ public class TimerManager {
 
         if (timer <= 0) {
             for (GameHandler.PlayerState state : handler.playerStateManager.values()) {
-                state.timeOut();
-                state.finished = true;
+                if (!state.finished) {
+                    state.timeOut();
+                    state.finished = true;
+                }
             }
         }
 
