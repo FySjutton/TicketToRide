@@ -42,8 +42,7 @@ public class GamePlayer {
         Collections.shuffle(validOptions);
         this.markerData = validOptions.getFirst();
 
-        game.gameMap.colors.forEach(map -> cards.put(map, 0));
-        cards.put(game.gameMap.wildCard, 0);
+        game.gameMap.getColors().forEach(map -> cards.put(map, 0));
     }
 
     public ArrayList<DestinationCard> getDestinationCards() {

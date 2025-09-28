@@ -2,6 +2,7 @@ package avox.test.ticketToRide.game;
 
 import avox.test.ticketToRide.game.gameHandler.GameHandler;
 import avox.test.ticketToRide.game.player.GamePlayer;
+import avox.test.ticketToRide.guis.GuiTools;
 import avox.test.ticketToRide.guis.PlayerGuiManager;
 import avox.test.ticketToRide.utils.BillboardManager;
 import net.kyori.adventure.text.Component;
@@ -11,10 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Random;
+import java.util.*;
 
 import static avox.test.ticketToRide.TicketToRide.playerStateManager;
 
@@ -32,6 +30,8 @@ public class Game {
     public TextDisplay infoText;
     private int infoTextStep = 1; // 1: not enough players, 2: start info
 
+    public MapColor[] cardBoard = new MapColor[5];
+
     public Game(Player gameOwner, Arena arena, GameMap gameMap) {
         this.gameOwner = gameOwner;
         this.arena = arena;
@@ -39,6 +39,8 @@ public class Game {
         addPlayer(gameOwner);
 
         infoText = new BillboardManager().spawnLine(arena.world, arena.mapStartPosition.clone().add((double) arena.tileX / 2, 2, (double) arena.tileY / 2), Component.text("Not enough players to start!", NamedTextColor.RED), 2, -1, false, true);
+
+        replaceFullBoard(true);
     }
 
     public void addPlayer(Player player) {
@@ -111,4 +113,45 @@ public class Game {
             }
         }
     }
+
+    public void newBoardCard(int i, boolean silent) {
+        ArrayList<MapColor> colors = gameMap.getColors();
+        Random rand = new Random();
+
+        cardBoard[i] = colors.get(rand.nextInt(colors.size()));
+        if (ensureValidBoard(colors, rand) && !silent) {
+            broadcast(GuiTools.getGray("Card Board contained 3 or more train cards! Fully replaced!"));
+        }
+    }
+
+    public void replaceFullBoard(boolean silent) {
+        ArrayList<MapColor> colors = gameMap.getColors();
+        Random rand = new Random();
+
+        for (int j = 0; j < cardBoard.length; j++) {
+            cardBoard[j] = colors.get(rand.nextInt(colors.size()));
+        }
+
+        if (ensureValidBoard(colors, rand) && !silent) {
+            broadcast(GuiTools.getGray("Card Board contained 3 or more train cards! Fully replaced!"));
+        }
+    }
+
+    private boolean ensureValidBoard(ArrayList<MapColor> colors, Random rand) {
+        boolean replaced = false;
+        while (countWildcards() >= 3) {
+            for (int j = 0; j < cardBoard.length; j++) {
+                cardBoard[j] = colors.get(rand.nextInt(colors.size()));
+            }
+            replaced = true;
+        }
+        return replaced;
+    }
+
+    private int countWildcards() {
+        return (int) Arrays.stream(cardBoard)
+                .filter(card -> card.equals(gameMap.wildCard))
+                .count();
+    }
+
 }

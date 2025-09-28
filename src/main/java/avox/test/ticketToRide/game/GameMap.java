@@ -51,6 +51,12 @@ public class GameMap {
         this.wildCard = wildCard;
     }
 
+    public ArrayList<MapColor> getColors() {
+        ArrayList<MapColor> mapColors = new ArrayList<>(colors);
+        mapColors.add(wildCard);
+        return mapColors;
+    }
+
     public MapColor getColor(String color) {
         return colors.stream().filter(c -> c.name.equalsIgnoreCase(color)).findFirst().orElse(null);
     }
