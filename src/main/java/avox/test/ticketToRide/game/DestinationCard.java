@@ -28,4 +28,12 @@ public class DestinationCard {
         int reward = new RewardCalculator().getReward(map, map.cities.get(indexA), map.cities.get(indexB));
         return new DestinationCard(map.cities.get(indexA), map.cities.get(indexB), reward);
     }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public int getReward() {
+        return reward;
+    }
 }

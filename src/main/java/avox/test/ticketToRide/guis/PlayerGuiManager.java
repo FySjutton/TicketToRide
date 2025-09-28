@@ -16,6 +16,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
@@ -53,9 +54,11 @@ public class PlayerGuiManager implements Listener {
     }
 
     private void runSlotActions(Player player, int slot, boolean runHoldAction) {
-        Map<Integer, ArrayList<GuiAction>> actions = entries.get(player).actions;
-        if (actions != null && actions.containsKey(slot)) {
-            for (GuiAction action : actions.get(slot)) {
+        Map<Integer, ArrayList<GuiAction>> actions = new HashMap<>(entries.get(player).actions);
+        if (actions.containsKey(slot)) {
+            List<GuiAction> slotActions = new ArrayList<>(actions.get(slot));
+
+            for (GuiAction action : slotActions) {
                 if (runHoldAction && action.holdAction != null) {
                     action.holdAction.run();
                 } else if (!runHoldAction && action.clickAction != null) {
@@ -63,6 +66,7 @@ public class PlayerGuiManager implements Listener {
                 }
             }
         }
+
     }
 
     // --- Event handlers ---

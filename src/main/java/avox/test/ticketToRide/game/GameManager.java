@@ -3,6 +3,7 @@ package avox.test.ticketToRide.game;
 import avox.test.ticketToRide.config.ArenaManager;
 import avox.test.ticketToRide.game.gameHandler.GameHandler;
 import avox.test.ticketToRide.game.player.GamePlayer;
+import avox.test.ticketToRide.guis.PlayerGuiManager;
 import avox.test.ticketToRide.renderer.MapSummoner;
 import avox.test.ticketToRide.utils.BillboardManager;
 import avox.test.ticketToRide.utils.board.MarkerManager;
@@ -71,9 +72,10 @@ public class GameManager {
 
     public static void deleteGame(Game game) {
         activeGames.remove(game);
-        for (Player player : game.arena.world.getPlayers()) {
+        for (Player player : game.gamePlayers.keySet()) {
             activePlayers.remove(player);
             playerStateManager.restorePlayer(player);
+            PlayerGuiManager.removeGui(player);
         }
         ArenaManager.unloadAndDeleteArenaWorld(game.arena.mapID);
     }

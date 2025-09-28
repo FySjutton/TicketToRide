@@ -31,6 +31,8 @@ public class GameHandler {
     public final DestinationHandler destinationHandler = new DestinationHandler(this);
     private final TimerManager timerManager = new TimerManager(this);
 
+    public GamePlayer currentTurn;
+
     public GameHandler(Game game) {
         this.game = game;
 

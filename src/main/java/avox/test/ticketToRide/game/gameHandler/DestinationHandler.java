@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public final class DestinationHandler {
+public class DestinationHandler {
     private final GameHandler gameHandler;
 
     public DestinationHandler(GameHandler gameHandler) {
@@ -162,7 +162,7 @@ public final class DestinationHandler {
         for (int i = 0; i < 9; i++) {
             player.getInventory().setItem(i, null);
         }
-        game.gamePlayers.get(player).destinationCards.addAll(acceptedCards);
+        game.gamePlayers.get(player).getDestinationCards().addAll(acceptedCards);
         state.finished = true;
         game.gameHandler.setDefaultHotbar(player);
     }

@@ -31,7 +31,7 @@ public class GamePlayer {
     public ItemDisplay beacon2;
     public int beaconSlot;
 
-    public ArrayList<DestinationCard> destinationCards = new ArrayList<>();
+    private final ArrayList<DestinationCard> destinationCards = new ArrayList<>();
 
     public GamePlayer(Game game, Player player) {
         this.player = player;
@@ -44,6 +44,21 @@ public class GamePlayer {
 
         game.gameMap.colors.forEach(map -> cards.put(map, 0));
         cards.put(game.gameMap.wildCard, 0);
+    }
+
+    public ArrayList<DestinationCard> getDestinationCards() {
+        return destinationCards;
+    }
+
+    public void addDestinationCard(DestinationCard card) {
+        destinationCards.add(card);
+        updateCardOrder();
+    }
+
+    public void updateCardOrder() {
+        destinationCards.sort(Comparator
+            .comparing(DestinationCard::isFinished)
+            .thenComparing(DestinationCard::getReward));
     }
 
     private static final ArrayList<MapColor> markerColors = new ArrayList<>(

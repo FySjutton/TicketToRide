@@ -2,15 +2,18 @@ package avox.test.ticketToRide.game;
 
 import avox.test.ticketToRide.game.gameHandler.GameHandler;
 import avox.test.ticketToRide.game.player.GamePlayer;
+import avox.test.ticketToRide.guis.PlayerGuiManager;
 import avox.test.ticketToRide.utils.BillboardManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
 import static avox.test.ticketToRide.TicketToRide.playerStateManager;
@@ -23,7 +26,7 @@ public class Game {
     public GameHandler gameHandler;
 
     public Player gameOwner;
-    public HashMap<Player, GamePlayer> gamePlayers = new HashMap<>();
+    public LinkedHashMap<Player, GamePlayer> gamePlayers = new LinkedHashMap<>();
     public ArrayList<Player> invites = new ArrayList<>();
 
     public TextDisplay infoText;
@@ -61,6 +64,7 @@ public class Game {
         playerStateManager.restorePlayer(player);
         GamePlayer gamePlayer = gamePlayers.get(player);
         gamePlayers.remove(player);
+        PlayerGuiManager.removeGui(player);
         GameManager.activePlayers.remove(player);
         if (gamePlayer.marker != null) {
             gamePlayer.marker.remove();
@@ -97,6 +101,14 @@ public class Game {
     public void broadcast(Component message) {
         for (Player player : gamePlayers.keySet()) {
             player.sendMessage(message);
+        }
+    }
+
+    public void broadcastTitle(Component title, Component subTitle, Player excludePlayer) {
+        for (Player player : gamePlayers.keySet()) {
+            if (!player.equals(excludePlayer)) {
+                player.showTitle(Title.title(title, subTitle));
+            }
         }
     }
 }

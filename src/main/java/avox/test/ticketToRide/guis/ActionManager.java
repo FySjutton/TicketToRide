@@ -18,6 +18,10 @@ public class ActionManager {
         inventory.setItem(slot, stack);
     }
 
+    public void removeAction(int slot) {
+        actions.remove(slot);
+    }
+
     public void clear() {
         actions.clear();
     }

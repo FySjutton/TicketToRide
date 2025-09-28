@@ -19,6 +19,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.Random;
 
 import static avox.test.ticketToRide.game.GameManager.*;
 
@@ -28,6 +29,25 @@ public class TestCommand {
 
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("test")
+                .then(Commands.literal("test")
+                    .executes(ctx -> {
+                        Player sender = (Player) ctx.getSource().getSender();
+//                        new ActionGui(sender);
+                        return 1;
+                    }))
+                .then(Commands.literal("add_destination_card")
+                    .executes(ctx -> {
+                        Player sender = (Player) ctx.getSource().getSender();
+                        Game game = getGameByUser(sender);
+                        if (game == null) return 0;
+                        GamePlayer player = game.gamePlayers.get(sender);
+                        DestinationCard card = DestinationCard.getDestinationCard(game.gameMap);
+                        if (new Random().nextInt(0, 2) == 1) {
+                            card.finished = true;
+                        }
+                        player.addDestinationCard(card);
+                        return 1;
+                }))
                 .then(Commands.literal("add_point")
                         .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                             .executes(ctx -> {
