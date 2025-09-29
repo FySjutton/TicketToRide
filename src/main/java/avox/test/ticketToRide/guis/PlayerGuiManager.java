@@ -66,7 +66,6 @@ public class PlayerGuiManager implements Listener {
                 }
             }
         }
-
     }
 
     // --- Event handlers ---

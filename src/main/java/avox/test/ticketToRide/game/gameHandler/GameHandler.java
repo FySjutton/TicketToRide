@@ -20,8 +20,8 @@ import java.nio.file.attribute.AclEntry;
 import java.util.*;
 
 public class GameHandler {
-    protected Game game;
-    protected HashMap<Player, PlayerState> playerStateManager = new HashMap<>();
+    public Game game;
+    public HashMap<Player, PlayerState> playerStateManager = new HashMap<>();
 
     public final DestinationHandler destinationHandler = new DestinationHandler(this);
     public final MoveManager moveManager = new MoveManager(this);
@@ -58,13 +58,16 @@ public class GameHandler {
                 player.cards.merge(card, 1, Integer::sum);
             }
 
-            Component message = Component.text("You received 4 starting cards:\n", NamedTextColor.YELLOW, TextDecoration.BOLD);
-            for (Map.Entry<MapColor, Integer> entry : startingCards.entrySet()) {
-                message = message.append(Component.text(entry.getValue() + "x ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false).append(entry.getKey().colored).append(Component.text(" card\n", NamedTextColor.GRAY)));
-            }
-
-            player.player.sendMessage(message);
+            sendNewCardMessage(player.player, startingCards, "You received 4 starting cards:");
         }
+    }
+
+    public void sendNewCardMessage(Player player, Map<MapColor, Integer> cards, String title) {
+        Component message = Component.text(title + "\n", NamedTextColor.YELLOW, TextDecoration.BOLD);
+        for (Map.Entry<MapColor, Integer> entry : cards.entrySet()) {
+            message = message.append(Component.text(entry.getValue() + "x ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false).append(entry.getKey().colored).append(Component.text(" card\n", NamedTextColor.GRAY)));
+        }
+        player.sendMessage(message);
     }
 
     public void setSelectActionHotbar(GamePlayer player) {
@@ -80,16 +83,15 @@ public class GameHandler {
     }
 
     private void setDefaultHotbar(GamePlayer player, boolean centered, Component name) {
-            Player user = player.player;
-            clearHotbar(user);
-            ActionManager actionManager = new ActionManager();
-            PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.createGui(user.getInventory(), user, actionManager, true, null);
+        Player user = player.player;
+        clearHotbar(user);
+        ActionManager actionManager = new ActionManager();
+        PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.createGui(user.getInventory(), user, actionManager, true, null);
 
-            actionManager.addAction(user.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), name),  centered ? 4 : 8, GuiAction.ofClick(() -> {
-                ViewInfo viewInfo = new ViewInfo(game, user, oldEntry, player.equals(game.gameHandler.currentTurn));
-                user.openInventory(viewInfo.gui);
-            }));
-        }
+        actionManager.addAction(user.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), name),  centered ? 4 : 8, GuiAction.ofClick(() -> {
+            ViewInfo viewInfo = new ViewInfo(game, user, oldEntry, player.equals(game.gameHandler.currentTurn));
+            user.openInventory(viewInfo.gui);
+        }));
     }
 
     public void clearHotbar(Player player) {

@@ -27,7 +27,7 @@ public class ViewInfo extends InventoryGui {
         GamePlayer player = game.gamePlayers.get(user);
         int startingIndex = chooseTurn ? 18 : 0;
         if (chooseTurn) {
-            initiateChooseTurn(game);
+            initiateChooseTurn(game, player);
         }
 
         gui.setItem(startingIndex + 4, GuiTools.format(
@@ -76,9 +76,9 @@ public class ViewInfo extends InventoryGui {
         );
     }
 
-    private void initiateChooseTurn(Game game) {
+    private void initiateChooseTurn(Game game, GamePlayer player) {
         actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.GRASS_BLOCK), GuiTools.getYellow("Place Route")), 2, GuiAction.ofClick(() -> game.gameHandler.moveManager.placeRoute()));
-        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards")), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards()));
+        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards")), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(player)));
         actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.NAME_TAG), GuiTools.getYellow("Take Up Routes")), 6, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickRoutes()));
     }
 }
