@@ -28,7 +28,6 @@ public class TimerManager {
         if (allFinished) {
             handler.playerStateManager.clear();
             nextAction.run();
-            broadcastReminder("✅ All players finished!");
             return;
         }
 

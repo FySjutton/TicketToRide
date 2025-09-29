@@ -115,7 +115,7 @@ public class Game {
     }
 
     public void newBoardCard(int i, boolean silent) {
-        ArrayList<MapColor> colors = gameMap.getColors();
+        ArrayList<MapColor> colors = gameMap.getAllColors();
         Random rand = new Random();
 
         cardBoard[i] = colors.get(rand.nextInt(colors.size()));
@@ -125,7 +125,7 @@ public class Game {
     }
 
     public void replaceFullBoard(boolean silent) {
-        ArrayList<MapColor> colors = gameMap.getColors();
+        ArrayList<MapColor> colors = gameMap.getAllColors();
         Random rand = new Random();
 
         for (int j = 0; j < cardBoard.length; j++) {

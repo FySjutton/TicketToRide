@@ -23,10 +23,10 @@ import java.util.ArrayList;
 public class PlayerGuiManager implements Listener {
     private static final HashMap<Player, PlayerEntry> entries = new HashMap<>();
 
-    public record PlayerEntry(Player player, GuiInventory inventory, Map<Integer, ArrayList<GuiAction>> actions, PlayerEntry onCloseEntry) {}
+    public record PlayerEntry(Player player, GuiInventory inventory, ActionManager actionManager, PlayerEntry onCloseEntry) {}
 
     public static PlayerEntry createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly, PlayerEntry onCloseEntry) {
-        PlayerEntry entry = new PlayerEntry(player, new GuiInventory(inventory, hotbarOnly), slotActions.actions, onCloseEntry);
+        PlayerEntry entry = new PlayerEntry(player, new GuiInventory(inventory, hotbarOnly), slotActions, onCloseEntry);
         entries.put(player, entry);
         return entry;
     }
@@ -54,7 +54,7 @@ public class PlayerGuiManager implements Listener {
     }
 
     private void runSlotActions(Player player, int slot, boolean runHoldAction) {
-        Map<Integer, ArrayList<GuiAction>> actions = new HashMap<>(entries.get(player).actions);
+        Map<Integer, ArrayList<GuiAction>> actions = new HashMap<>(entries.get(player).actionManager.actions);
         if (actions.containsKey(slot)) {
             List<GuiAction> slotActions = new ArrayList<>(actions.get(slot));
 

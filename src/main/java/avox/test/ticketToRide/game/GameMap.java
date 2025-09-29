@@ -1,12 +1,10 @@
 package avox.test.ticketToRide.game;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class GameMap {
@@ -51,7 +49,7 @@ public class GameMap {
         this.wildCard = wildCard;
     }
 
-    public ArrayList<MapColor> getColors() {
+    public ArrayList<MapColor> getAllColors() {
         ArrayList<MapColor> mapColors = new ArrayList<>(colors);
         mapColors.add(wildCard);
         return mapColors;

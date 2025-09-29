@@ -50,7 +50,7 @@ public class DestinationHandler {
 
         actionManager.addAction(inventory, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Return")), 8, GuiAction.ofClick(() -> {
             PlayerGuiManager.removeGui(player);
-            gameHandler.setDefaultHotbar(player);
+            gameHandler.setDefaultHotbar(player, false);
         }));
     }
 
@@ -164,7 +164,7 @@ public class DestinationHandler {
         }
         game.gamePlayers.get(player).getDestinationCards().addAll(acceptedCards);
         state.finished = true;
-        game.gameHandler.setDefaultHotbar(player);
+        game.gameHandler.setDefaultHotbar(player, false);
     }
 
     private void beaconHolder(Player player, int slot, DestinationCard card) {
@@ -186,7 +186,7 @@ public class DestinationHandler {
         public String error = "§cYou must toggle all!";
 
         public DestinationSelectionAction(Game game, Player player, ActionManager actionManager) {
-            super(game, player, actionManager);
+            super(game, player, actionManager, true);
         }
 
         @Override

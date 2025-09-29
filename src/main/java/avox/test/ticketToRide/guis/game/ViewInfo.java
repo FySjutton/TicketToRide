@@ -22,23 +22,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewInfo extends InventoryGui {
-    public ViewInfo(Game game, Player user, PlayerGuiManager.PlayerEntry oldState) {
-        super(user, 27, Component.text(user.getName() + " Game Info"), oldState);
+    public ViewInfo(Game game, Player user, PlayerGuiManager.PlayerEntry oldState, boolean chooseTurn) {
+        super(user, chooseTurn ? 54 : 36, Component.text(chooseTurn ? "Pick an action" : "Game Info"), oldState);
         GamePlayer player = game.gamePlayers.get(user);
+        int startingIndex = chooseTurn ? 18 : 0;
+        if (chooseTurn) {
+            initiateChooseTurn(game);
+        }
 
-        gui.setItem(0, GuiTools.format(
+        gui.setItem(startingIndex + 4, GuiTools.format(
                 new ItemStack(player.markerData.material).add(player.trains - 1),
                 GuiTools.getYellow("Trains left: ").append(GuiTools.colorize(player.trains + "/" + player.game.gameMap.startingTrains, NamedTextColor.GRAY)),
                 game.gamePlayers.values().stream().filter(gamePlayer -> !gamePlayer.equals(player)).map(gamePlayer -> gamePlayer.markerData.colored.append(GuiTools.getGray(" - " + gamePlayer.trains))).toList()
         ));
 
-        int startCardBoard = 4;
+        int startCardBoard = startingIndex + 11;
         for (int i = 0; i < 5; i++) {
             MapColor card = game.cardBoard[i];
             gui.setItem(startCardBoard + i, GuiTools.format(new ItemStack(card.material), card.colored.decorate(TextDecoration.BOLD).append(GuiTools.getYellow(" Card")), List.of(GuiTools.getGray("The face up cards."))));
         }
 
-        new ScrollableRow<>(actionManager, gui, 9, 9, new ArrayList<>(player.cards.keySet()), null) {
+        new ScrollableRow<>(actionManager, gui, startingIndex + 18, 9, new ArrayList<>(player.cards.keySet()), null) {
             @Override
             public ItemStack getSlotItem(MapColor color) {
                 int cards = player.cards.get(color);
@@ -52,7 +56,7 @@ public class ViewInfo extends InventoryGui {
             }
         };
 
-        int startSlot = 18;
+        int startSlot = startingIndex + 27;
         ScrollableRow<DestinationCard> scrollableRow = new ScrollableRow<>(actionManager, gui, startSlot, 8, player.getDestinationCards(), GuiTools.getYellow("Empty Destination Card Slot")) {
             @Override
             public ItemStack getSlotItem(DestinationCard item) {
@@ -70,5 +74,11 @@ public class ViewInfo extends InventoryGui {
                 }
             })
         );
+    }
+
+    private void initiateChooseTurn(Game game) {
+        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.GRASS_BLOCK), GuiTools.getYellow("Place Route")), 2, GuiAction.ofClick(() -> game.gameHandler.moveManager.placeRoute()));
+        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards")), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards()));
+        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.NAME_TAG), GuiTools.getYellow("Take Up Routes")), 6, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickRoutes()));
     }
 }

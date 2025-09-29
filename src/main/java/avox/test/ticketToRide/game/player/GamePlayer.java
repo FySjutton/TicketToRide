@@ -4,9 +4,7 @@ import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.game.DestinationCard;
 import avox.test.ticketToRide.game.Game;
 import avox.test.ticketToRide.game.MapColor;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -42,7 +40,7 @@ public class GamePlayer {
         Collections.shuffle(validOptions);
         this.markerData = validOptions.getFirst();
 
-        game.gameMap.getColors().forEach(map -> cards.put(map, 0));
+        game.gameMap.getAllColors().forEach(map -> cards.put(map, 0));
     }
 
     public ArrayList<DestinationCard> getDestinationCards() {

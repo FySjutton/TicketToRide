@@ -1,7 +1,7 @@
 package avox.test.ticketToRide.game.gameHandler;
 
-import avox.test.ticketToRide.game.DestinationCard;
 import avox.test.ticketToRide.game.Game;
+import avox.test.ticketToRide.game.MapColor;
 import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.guis.ActionManager;
 import avox.test.ticketToRide.guis.GuiAction;
@@ -10,31 +10,28 @@ import avox.test.ticketToRide.guis.PlayerGuiManager;
 import avox.test.ticketToRide.guis.game.ViewInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.checkerframework.checker.units.qual.A;
 
-import java.util.HashMap;
-import java.util.List;
-
-import static avox.test.ticketToRide.TicketToRide.plugin;
+import java.nio.file.attribute.AclEntry;
+import java.util.*;
 
 public class GameHandler {
     protected Game game;
     protected HashMap<Player, PlayerState> playerStateManager = new HashMap<>();
 
     public final DestinationHandler destinationHandler = new DestinationHandler(this);
-    private final TimerManager timerManager = new TimerManager(this);
+    public final MoveManager moveManager = new MoveManager(this);
+    public final TimerManager timerManager = new TimerManager(this);
 
     public GamePlayer currentTurn;
 
     public GameHandler(Game game) {
         this.game = game;
+        Random rand = new Random();
 
         // Start by letting all players choose at least 2 cards
         for (Player player : game.gamePlayers.keySet()) {
@@ -43,18 +40,56 @@ public class GameHandler {
         }
         timerManager.startTimedAction(120, () -> {
             game.broadcast("§aAll players have finished choosing their routes.");
+            giveStartingCards(rand);
+
+            // Start with a random player
+            moveManager.startMove(game, game.gamePlayers.values().stream().toList().get(rand.nextInt(0, game.gamePlayers.size())));
         });
     }
 
-    public void setDefaultHotbar(Player player) {
-        clearHotbar(player);
-        ActionManager actionManager = new ActionManager();
-        PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.createGui(player.getInventory(), player, actionManager, true, null);
+    private void giveStartingCards(Random rand) {
+        List<MapColor> cards = game.gameMap.getAllColors();
 
-        actionManager.addAction(player.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Show Info")), 8, GuiAction.ofClick(() -> {
-            ViewInfo viewInfo = new ViewInfo(game, player, oldEntry);
-            player.openInventory(viewInfo.gui);
-        }));
+        for (GamePlayer player : game.gamePlayers.values()) {
+            HashMap<MapColor, Integer> startingCards = new HashMap<>();
+            for (int i = 0; i < 4; i++) {
+                MapColor card = cards.get(rand.nextInt(cards.size()));
+                startingCards.merge(card, 1, Integer::sum);
+                player.cards.merge(card, 1, Integer::sum);
+            }
+
+            Component message = Component.text("You received 4 starting cards:\n", NamedTextColor.YELLOW, TextDecoration.BOLD);
+            for (Map.Entry<MapColor, Integer> entry : startingCards.entrySet()) {
+                message = message.append(Component.text(entry.getValue() + "x ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false).append(entry.getKey().colored).append(Component.text(" card\n", NamedTextColor.GRAY)));
+            }
+
+            player.player.sendMessage(message);
+        }
+    }
+
+    public void setSelectActionHotbar(GamePlayer player) {
+        setDefaultHotbar(player, true, GuiTools.getYellow("Select Action"));
+    }
+
+    public void setDefaultHotbar(Player player, boolean centered) {
+        setDefaultHotbar(game.gamePlayers.get(player), centered);
+    }
+
+    public void setDefaultHotbar(GamePlayer player, boolean centered) {
+        setDefaultHotbar(player, centered, GuiTools.getYellow("Show Info"));
+    }
+
+    private void setDefaultHotbar(GamePlayer player, boolean centered, Component name) {
+            Player user = player.player;
+            clearHotbar(user);
+            ActionManager actionManager = new ActionManager();
+            PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.createGui(user.getInventory(), user, actionManager, true, null);
+
+            actionManager.addAction(user.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), name),  centered ? 4 : 8, GuiAction.ofClick(() -> {
+                ViewInfo viewInfo = new ViewInfo(game, user, oldEntry, player.equals(game.gameHandler.currentTurn));
+                user.openInventory(viewInfo.gui);
+            }));
+        }
     }
 
     public void clearHotbar(Player player) {
@@ -69,12 +104,14 @@ public class GameHandler {
         public ActionManager actionManager;
         public boolean finished = false;
 
-        public PlayerState(Game game, Player player, ActionManager actionManager) {
+        public PlayerState(Game game, Player player, ActionManager actionManager, boolean createGui) {
             this.game = game;
             this.player = player;
             this.actionManager = actionManager;
 
-            PlayerGuiManager.createGui(player.getInventory(), player, actionManager, true, null);
+            if (createGui) {
+                PlayerGuiManager.createGui(player.getInventory(), player, actionManager, true, null);
+            }
         }
 
         public abstract void timeOut();
