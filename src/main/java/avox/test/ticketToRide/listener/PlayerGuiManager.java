@@ -1,5 +1,7 @@
-package avox.test.ticketToRide.guis;
+package avox.test.ticketToRide.listener;
 
+import avox.test.ticketToRide.guis.ActionManager;
+import avox.test.ticketToRide.guis.GuiAction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;

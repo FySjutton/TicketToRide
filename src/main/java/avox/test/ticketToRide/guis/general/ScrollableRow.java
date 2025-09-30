@@ -1,10 +1,8 @@
 package avox.test.ticketToRide.guis.general;
 
-import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.game.player.GamePlayer;
 import avox.test.ticketToRide.guis.ActionManager;
 import avox.test.ticketToRide.guis.GuiAction;
-import avox.test.ticketToRide.guis.GuiTools;
+import avox.test.ticketToRide.util.GuiTools;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

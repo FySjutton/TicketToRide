@@ -1,4 +1,4 @@
-package avox.test.ticketToRide.game;
+package avox.test.ticketToRide.game.core;
 
 public record City(String name, int height, int width, int x, int y, boolean city) {}
 

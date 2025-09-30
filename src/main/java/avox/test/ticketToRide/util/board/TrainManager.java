@@ -1,12 +1,10 @@
-package avox.test.ticketToRide.renderer;
+package avox.test.ticketToRide.util.board;
 
-import avox.test.ticketToRide.game.Arena;
-import avox.test.ticketToRide.game.GameMap;
-import avox.test.ticketToRide.game.Route;
+import avox.test.ticketToRide.game.core.arena.Arena;
+import avox.test.ticketToRide.game.core.game.GameMap;
+import avox.test.ticketToRide.game.core.Route;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
@@ -15,7 +13,7 @@ import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class TrainRenderer {
+public class TrainManager {
     public void spawnSmallTrainCar(Arena arena, GameMap map, Route.Tile tile) {
         GameMap.TileMap tileMap = map.tileMaps.get(tile.rotation);
         Location spawnLocation = map.getStartLocation(arena).clone().add((double) (tile.x + tileMap.centerX) / 128, 0.05, (double) (tile.y + tileMap.centerY) / 128);

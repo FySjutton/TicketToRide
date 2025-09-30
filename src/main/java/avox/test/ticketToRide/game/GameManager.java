@@ -1,12 +1,16 @@
 package avox.test.ticketToRide.game;
 
 import avox.test.ticketToRide.config.ArenaManager;
+import avox.test.ticketToRide.game.core.arena.Arena;
+import avox.test.ticketToRide.game.core.arena.BaseArena;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.game.GameMap;
+import avox.test.ticketToRide.game.core.game.GamePlayer;
 import avox.test.ticketToRide.game.gameHandler.GameHandler;
-import avox.test.ticketToRide.game.player.GamePlayer;
-import avox.test.ticketToRide.guis.PlayerGuiManager;
-import avox.test.ticketToRide.renderer.MapSummoner;
-import avox.test.ticketToRide.utils.BillboardManager;
-import avox.test.ticketToRide.utils.board.MarkerManager;
+import avox.test.ticketToRide.listener.PlayerGuiManager;
+import avox.test.ticketToRide.util.board.MapManager;
+import avox.test.ticketToRide.util.board.BillboardManager;
+import avox.test.ticketToRide.util.board.MarkerManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -32,7 +36,7 @@ public class GameManager {
                 return;
             }
 
-            new MapSummoner().generateAndDisplay(gameArena.world, gameMap.map, gameArena.mapStartPosition, gameMap.tilesX, gameMap.tilesY);
+            new MapManager().generateAndDisplay(gameArena.world, gameMap.map, gameArena.mapStartPosition, gameMap.tilesX, gameMap.tilesY);
             new BillboardManager().summonBillboards(gameArena);
 
 

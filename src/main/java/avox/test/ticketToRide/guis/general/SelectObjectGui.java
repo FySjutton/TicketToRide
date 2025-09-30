@@ -1,7 +1,7 @@
 package avox.test.ticketToRide.guis.general;
 
 import avox.test.ticketToRide.guis.GuiAction;
-import avox.test.ticketToRide.guis.GuiTools;
+import avox.test.ticketToRide.util.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static avox.test.ticketToRide.guis.GuiTools.colorize;
-import static avox.test.ticketToRide.guis.GuiTools.getYellow;
+import static avox.test.ticketToRide.util.GuiTools.colorize;
+import static avox.test.ticketToRide.util.GuiTools.getYellow;
 
 public class SelectObjectGui<T> extends InventoryGui {
     private ArrayList<ObjectEntry> options;

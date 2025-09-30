@@ -1,4 +1,4 @@
-package avox.test.ticketToRide.renderer;
+package avox.test.ticketToRide.util.board;
 
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class MapSummoner {
+public class MapManager {
     public void generateAndDisplay(World world, File imageFile, Location baseLocation, int tilesX, int tilesY) {
         int tileSize = 128;
         int totalWidth = tileSize * tilesX;

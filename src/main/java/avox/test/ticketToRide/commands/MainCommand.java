@@ -1,8 +1,10 @@
 package avox.test.ticketToRide.commands;
 
 import avox.test.ticketToRide.game.*;
-import avox.test.ticketToRide.game.player.GamePlayer;
-import avox.test.ticketToRide.guis.createGame.CreateGameGui;
+import avox.test.ticketToRide.game.core.arena.BaseArena;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.game.GameMap;
+import avox.test.ticketToRide.guis.game.CreateGameGui;
 import avox.test.ticketToRide.guis.general.SelectObjectGui;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -25,8 +27,8 @@ import java.util.concurrent.CompletableFuture;
 import static avox.test.ticketToRide.config.ArenaManager.arenas;
 import static avox.test.ticketToRide.config.MapManager.maps;
 import static avox.test.ticketToRide.game.GameManager.*;
-import static avox.test.ticketToRide.guis.GuiTools.getGray;
-import static avox.test.ticketToRide.guis.GuiTools.getYellow;
+import static avox.test.ticketToRide.util.GuiTools.getGray;
+import static avox.test.ticketToRide.util.GuiTools.getYellow;
 
 public class MainCommand {
     public LiteralCommandNode<CommandSourceStack> build() {

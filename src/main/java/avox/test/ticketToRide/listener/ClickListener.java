@@ -1,8 +1,7 @@
 package avox.test.ticketToRide.listener;
 
-import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.game.GameMap;
-import avox.test.ticketToRide.game.Route;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.Route;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.*;
@@ -12,12 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import static avox.test.ticketToRide.game.GameManager.activePlayers;
 import static avox.test.ticketToRide.game.GameManager.getGameByUser;

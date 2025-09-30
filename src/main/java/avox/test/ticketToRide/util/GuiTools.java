@@ -1,4 +1,4 @@
-package avox.test.ticketToRide.guis;
+package avox.test.ticketToRide.util;
 
 import com.destroystokyo.paper.profile.ProfileProperty;
 import io.papermc.paper.datacomponent.DataComponentTypes;

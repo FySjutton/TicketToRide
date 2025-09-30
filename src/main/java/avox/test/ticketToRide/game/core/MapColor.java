@@ -1,4 +1,4 @@
-package avox.test.ticketToRide.game;
+package avox.test.ticketToRide.game.core;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;

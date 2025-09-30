@@ -1,4 +1,4 @@
-package avox.test.ticketToRide.game;
+package avox.test.ticketToRide.game.core.arena;
 
 import avox.test.ticketToRide.config.ArenaManager;
 import org.bukkit.Location;

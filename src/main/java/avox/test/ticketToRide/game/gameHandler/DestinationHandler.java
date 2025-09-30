@@ -1,25 +1,22 @@
 package avox.test.ticketToRide.game.gameHandler;
 
-import avox.test.ticketToRide.game.DestinationCard;
-import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.game.player.GamePlayer;
+import avox.test.ticketToRide.game.core.DestinationCard;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.game.GamePlayer;
 import avox.test.ticketToRide.guis.ActionManager;
 import avox.test.ticketToRide.guis.GuiAction;
-import avox.test.ticketToRide.guis.GuiTools;
-import avox.test.ticketToRide.guis.PlayerGuiManager;
+import avox.test.ticketToRide.util.GuiTools;
+import avox.test.ticketToRide.listener.PlayerGuiManager;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.checkerframework.checker.units.qual.A;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class DestinationHandler {
     private final GameHandler gameHandler;

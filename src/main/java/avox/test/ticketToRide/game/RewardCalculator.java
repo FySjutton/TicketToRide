@@ -1,5 +1,8 @@
 package avox.test.ticketToRide.game;
 
+import avox.test.ticketToRide.game.core.City;
+import avox.test.ticketToRide.game.core.game.GameMap;
+
 import java.util.*;
 
 public class RewardCalculator {

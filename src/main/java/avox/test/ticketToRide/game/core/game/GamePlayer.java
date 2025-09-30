@@ -1,9 +1,8 @@
-package avox.test.ticketToRide.game.player;
+package avox.test.ticketToRide.game.core.game;
 
 import avox.test.ticketToRide.TicketToRide;
-import avox.test.ticketToRide.game.DestinationCard;
-import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.game.MapColor;
+import avox.test.ticketToRide.game.core.DestinationCard;
+import avox.test.ticketToRide.game.core.MapColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

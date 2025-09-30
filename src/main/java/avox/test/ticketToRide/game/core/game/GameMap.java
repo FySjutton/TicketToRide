@@ -1,5 +1,9 @@
-package avox.test.ticketToRide.game;
+package avox.test.ticketToRide.game.core.game;
 
+import avox.test.ticketToRide.game.core.arena.Arena;
+import avox.test.ticketToRide.game.core.City;
+import avox.test.ticketToRide.game.core.MapColor;
+import avox.test.ticketToRide.game.core.Route;
 import org.bukkit.Location;
 
 import java.io.File;

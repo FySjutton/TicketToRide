@@ -1,6 +1,6 @@
 package avox.test.ticketToRide.game.gameHandler;
 
-import avox.test.ticketToRide.guis.GuiTools;
+import avox.test.ticketToRide.util.GuiTools;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

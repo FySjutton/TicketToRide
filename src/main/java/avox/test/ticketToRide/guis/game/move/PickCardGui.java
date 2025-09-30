@@ -1,12 +1,12 @@
 package avox.test.ticketToRide.guis.game.move;
 
-import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.game.MapColor;
-import avox.test.ticketToRide.game.player.GamePlayer;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.MapColor;
+import avox.test.ticketToRide.game.core.game.GamePlayer;
 import avox.test.ticketToRide.guis.GuiAction;
-import avox.test.ticketToRide.guis.GuiTools;
+import avox.test.ticketToRide.util.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
-import avox.test.ticketToRide.guis.PlayerGuiManager;
+import avox.test.ticketToRide.listener.PlayerGuiManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;

@@ -1,13 +1,13 @@
-package avox.test.ticketToRide.guis.createGame;
+package avox.test.ticketToRide.guis.game;
 
 import avox.test.ticketToRide.TicketToRide;
-import avox.test.ticketToRide.game.BaseArena;
+import avox.test.ticketToRide.game.core.arena.BaseArena;
 import avox.test.ticketToRide.game.GameManager;
-import avox.test.ticketToRide.game.GameMap;
+import avox.test.ticketToRide.game.core.game.GameMap;
 import avox.test.ticketToRide.guis.GuiAction;
-import avox.test.ticketToRide.guis.GuiTools;
+import avox.test.ticketToRide.util.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
-import avox.test.ticketToRide.guis.PlayerGuiManager;
+import avox.test.ticketToRide.listener.PlayerGuiManager;
 import avox.test.ticketToRide.guis.general.SelectObjectGui;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static avox.test.ticketToRide.commands.MainCommand.invitePlayer;
-import static avox.test.ticketToRide.guis.GuiTools.*;
+import static avox.test.ticketToRide.util.GuiTools.*;
 
 public class CreateGameGui extends InventoryGui {
     private final ArrayList<Player> opponents = new ArrayList<>();

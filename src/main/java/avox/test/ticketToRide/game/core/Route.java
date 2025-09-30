@@ -1,9 +1,6 @@
-package avox.test.ticketToRide.game;
-
-import org.bukkit.Material;
+package avox.test.ticketToRide.game.core;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class Route {
     public City point_a;

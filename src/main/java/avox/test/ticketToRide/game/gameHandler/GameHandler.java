@@ -1,12 +1,12 @@
 package avox.test.ticketToRide.game.gameHandler;
 
-import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.game.MapColor;
-import avox.test.ticketToRide.game.player.GamePlayer;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.MapColor;
+import avox.test.ticketToRide.game.core.game.GamePlayer;
 import avox.test.ticketToRide.guis.ActionManager;
 import avox.test.ticketToRide.guis.GuiAction;
-import avox.test.ticketToRide.guis.GuiTools;
-import avox.test.ticketToRide.guis.PlayerGuiManager;
+import avox.test.ticketToRide.util.GuiTools;
+import avox.test.ticketToRide.listener.PlayerGuiManager;
 import avox.test.ticketToRide.guis.game.ViewInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.nio.file.attribute.AclEntry;
 import java.util.*;
 
 public class GameHandler {

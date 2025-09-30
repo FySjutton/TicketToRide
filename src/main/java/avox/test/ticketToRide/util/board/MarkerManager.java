@@ -1,12 +1,9 @@
-package avox.test.ticketToRide.utils.board;
+package avox.test.ticketToRide.util.board;
 
-import avox.test.ticketToRide.game.Game;
-import avox.test.ticketToRide.game.GameMap;
-import avox.test.ticketToRide.game.player.GamePlayer;
-import org.bukkit.Location;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.game.GameMap;
+import avox.test.ticketToRide.game.core.game.GamePlayer;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;

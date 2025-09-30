@@ -1,17 +1,13 @@
 package avox.test.ticketToRide.config;
 
-import avox.test.ticketToRide.game.City;
-import avox.test.ticketToRide.game.GameMap;
-import avox.test.ticketToRide.game.MapColor;
-import avox.test.ticketToRide.game.Route;
+import avox.test.ticketToRide.game.core.City;
+import avox.test.ticketToRide.game.core.game.GameMap;
+import avox.test.ticketToRide.game.core.MapColor;
+import avox.test.ticketToRide.game.core.Route;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 
 import java.io.File;

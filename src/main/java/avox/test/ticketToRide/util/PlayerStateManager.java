@@ -1,4 +1,4 @@
-package avox.test.ticketToRide.utils;
+package avox.test.ticketToRide.util;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;

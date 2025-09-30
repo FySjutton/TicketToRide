@@ -1,9 +1,6 @@
-package avox.test.ticketToRide.utils;
+package avox.test.ticketToRide.util.board;
 
-import avox.test.ticketToRide.TicketToRide;
-import avox.test.ticketToRide.game.Arena;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import avox.test.ticketToRide.game.core.arena.Arena;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
@@ -16,7 +13,6 @@ import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BillboardManager {

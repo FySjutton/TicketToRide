@@ -1,7 +1,7 @@
 package avox.test.ticketToRide.config;
 
 import avox.test.ticketToRide.TicketToRide;
-import avox.test.ticketToRide.game.BaseArena;
+import avox.test.ticketToRide.game.core.arena.BaseArena;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

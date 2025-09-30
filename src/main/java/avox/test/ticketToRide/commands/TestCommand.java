@@ -1,8 +1,12 @@
 package avox.test.ticketToRide.commands;
 
 import avox.test.ticketToRide.game.*;
-import avox.test.ticketToRide.game.player.GamePlayer;
-import avox.test.ticketToRide.utils.board.MarkerManager;
+import avox.test.ticketToRide.game.core.*;
+import avox.test.ticketToRide.game.core.arena.Arena;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.core.game.GameMap;
+import avox.test.ticketToRide.game.core.game.GamePlayer;
+import avox.test.ticketToRide.util.board.MarkerManager;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.Commands;

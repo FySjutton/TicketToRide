@@ -1,6 +1,7 @@
-package avox.test.ticketToRide.game;
+package avox.test.ticketToRide.game.core;
 
-import org.bukkit.entity.Player;
+import avox.test.ticketToRide.game.RewardCalculator;
+import avox.test.ticketToRide.game.core.game.GameMap;
 
 import java.util.*;
 
