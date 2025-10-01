@@ -42,7 +42,7 @@ public class Game {
 
         infoText = new BillboardManager().spawnLine(arena.world, arena.mapStartPosition.clone().add((double) arena.tileX / 2, 2, (double) arena.tileY / 2), Component.text("Not enough players to start!", NamedTextColor.RED), 2, -1, false, true);
 
-        replaceFullBoard(cardBoard, true);
+        replaceFullBoard(true);
     }
 
     public void addPlayer(Player player) {
@@ -108,6 +108,14 @@ public class Game {
         }
     }
 
+    public void broadcast(Component message, Player excludePlayer) {
+        for (Player player : gamePlayers.keySet()) {
+            if (!player.equals(excludePlayer)) {
+                player.sendMessage(message);
+            }
+        }
+    }
+
     public void broadcastTitle(Component title, Component subTitle, Player excludePlayer) {
         for (Player player : gamePlayers.keySet()) {
             if (!player.equals(excludePlayer)) {
@@ -116,12 +124,12 @@ public class Game {
         }
     }
 
-    public Component newBoardCard(int i, MapColor[] board, boolean silent) {
+    public Component newBoardCard(int i, boolean silent) {
         ArrayList<MapColor> colors = gameMap.getAllColors();
         Random rand = new Random();
 
-        board[i] = colors.get(rand.nextInt(colors.size()));
-        if (ensureValidBoard(colors, board, rand)) {
+        cardBoard[i] = colors.get(rand.nextInt(colors.size()));
+        if (ensureValidBoard(colors, rand)) {
             Component message = GuiTools.getGray("Card Board contained 3 or more train cards! Fully replaced!");
             if (silent) {
                 return message;
@@ -131,7 +139,7 @@ public class Game {
         return null;
     }
 
-    public Component replaceFullBoard(MapColor[] board, boolean silent) {
+    public Component replaceFullBoard(boolean silent) {
         ArrayList<MapColor> colors = gameMap.getAllColors();
         Random rand = new Random();
 
@@ -139,7 +147,7 @@ public class Game {
             cardBoard[j] = colors.get(rand.nextInt(colors.size()));
         }
 
-        if (ensureValidBoard(colors, board, rand)) {
+        if (ensureValidBoard(colors, rand)) {
             Component message = GuiTools.getGray("Card Board contained 3 or more train cards! Fully replaced!");
             if (silent) {
                 return message;
@@ -149,19 +157,19 @@ public class Game {
         return null;
     }
 
-    private boolean ensureValidBoard(ArrayList<MapColor> colors, MapColor[] board, Random rand) {
+    private boolean ensureValidBoard(ArrayList<MapColor> colors, Random rand) {
         boolean replaced = false;
-        while (countWildcards(board) >= 3) {
-            for (int j = 0; j < board.length; j++) {
-                board[j] = colors.get(rand.nextInt(colors.size()));
+        while (countWildcards() >= 3) {
+            for (int j = 0; j < cardBoard.length; j++) {
+                cardBoard[j] = colors.get(rand.nextInt(colors.size()));
             }
             replaced = true;
         }
         return replaced;
     }
 
-    private int countWildcards(MapColor[] board) {
-        return (int) Arrays.stream(board)
+    private int countWildcards() {
+        return (int) Arrays.stream(cardBoard)
                 .filter(card -> card.equals(gameMap.wildCard))
                 .count();
     }

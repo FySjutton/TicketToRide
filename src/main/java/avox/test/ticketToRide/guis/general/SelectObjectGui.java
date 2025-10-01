@@ -56,7 +56,7 @@ public class SelectObjectGui<T> extends InventoryGui {
         for (ObjectEntry map : pageMaps) {
             ItemStack item = GuiTools.format(GuiTools.createHead(map.texture), map.name, List.of(map.error ? map.message : map.description));
             int finalSlot = slot;
-            actionManager.addAction(gui, item, slot, GuiAction.ofClick(() -> {
+            actionManager.setAction(gui, item, slot, GuiAction.ofClick(() -> {
                 if (!map.error) {
                     if (multiselect) {
                         map.selected = !map.selected;
@@ -77,7 +77,7 @@ public class SelectObjectGui<T> extends InventoryGui {
                 List.of(colorize(Component.text("Click to invite all selected players!"), NamedTextColor.GRAY))
             );
 
-            actionManager.addAction(gui, finishButton, 31, GuiAction.ofClick(() -> finalAction.accept(new ArrayList<>(options.stream().filter(option -> option.selected).toList()))));
+            actionManager.setAction(gui, finishButton, 31, GuiAction.ofClick(() -> finalAction.accept(new ArrayList<>(options.stream().filter(option -> option.selected).toList()))));
         }
 
         if (pages > 1 && pages != page) {
@@ -87,7 +87,7 @@ public class SelectObjectGui<T> extends InventoryGui {
                 List.of(colorize(Component.text("Page " + (page + 1) + "/" + pages), NamedTextColor.GRAY))
             );
 
-            actionManager.addAction(gui, arrow, 35, GuiAction.ofClick(() -> {
+            actionManager.setAction(gui, arrow, 35, GuiAction.ofClick(() -> {
                 gui.clear(35);
                 page++;
                 updateInventory();
@@ -100,7 +100,7 @@ public class SelectObjectGui<T> extends InventoryGui {
                     List.of(colorize(Component.text("Page " + (page - 1) + "/" + pages), NamedTextColor.GRAY))
             );
 
-            actionManager.addAction(gui, arrow, 27, GuiAction.ofClick(() -> {
+            actionManager.setAction(gui, arrow, 27, GuiAction.ofClick(() -> {
                 gui.clear(27);
                 page--;
                 updateInventory();

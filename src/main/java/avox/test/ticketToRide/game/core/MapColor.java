@@ -17,6 +17,10 @@ public final class MapColor {
     public final Component colored;
     public final Color color;
 
+    public MapColor(String name) {
+        this(name, Material.WHITE_WOOL, Component.text(name), Color.WHITE);
+    }
+
     public MapColor(String name, Material material) {
         this(name, material, coloredTextFromString(name, false), getColor(name));
     }

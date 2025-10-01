@@ -35,17 +35,17 @@ public class DestinationHandler {
         for (int i = 0; i < cards.size(); i++) {
             DestinationCard card = cards.get(i);
             int finalI = i;
-            actionManager.addAction(inventory, GuiTools.format(
+            actionManager.setAction(inventory, GuiTools.format(
                     new ItemStack(Material.NAME_TAG),
                     GuiTools.getYellow(card.pointA.name() + " - " + card.pointB.name() + " (" + card.reward + " points)")
             ), i, GuiAction.ofHold(() -> beaconHolder(player, finalI, card)));
         }
 
         for (int i = cards.size(); i < 9; i++) {
-            actionManager.addAction(i, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
+            actionManager.setAction(i, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
         }
 
-        actionManager.addAction(inventory, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Return")), 8, GuiAction.ofClick(() -> {
+        actionManager.setAction(inventory, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Return")), 8, GuiAction.ofClick(() -> {
             PlayerGuiManager.removeGui(player);
             gameHandler.setDefaultHotbar(player, false);
         }));
@@ -68,10 +68,10 @@ public class DestinationHandler {
         setDestinationCard(game, state, inventory, 5, minimumAccepts, maximumAccepts);
 
         for (int slot : List.of(0, 7, 8)) {
-            actionManager.addAction(slot, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
+            actionManager.setAction(slot, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
         }
 
-        actionManager.addAction(
+        actionManager.setAction(
                 inventory,
                 GuiTools.format(
                     new ItemStack(Material.RED_CONCRETE),
@@ -110,7 +110,7 @@ public class DestinationHandler {
                 GuiTools.getYellow("Click to toggle")
         );
         state.actionManager.addAction(inventory, toggleItem, toggleSlot, GuiAction.ofClick(() -> toggleCard(state, inventory, toggleSlot, card, minimumAccepts, maximumAccepts)));
-        state.actionManager.addAction(toggleSlot, GuiAction.ofHold(() -> beaconHolder(state.player, slot, card)));
+        state.actionManager.addAction(toggleSlot, GuiAction.ofHold(() -> beaconHolder(state.player, toggleSlot, card)));
     }
 
     private void toggleCard(DestinationSelectionAction state, Inventory inventory, int slot, DestinationCard card, int minimumAccepts, int maximumAccepts) {

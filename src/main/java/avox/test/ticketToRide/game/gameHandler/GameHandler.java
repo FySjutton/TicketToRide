@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class GameHandler {
     public Game game;
@@ -25,8 +26,6 @@ public class GameHandler {
     public final DestinationHandler destinationHandler = new DestinationHandler(this);
     public final MoveManager moveManager = new MoveManager(this);
     public final TimerManager timerManager = new TimerManager(this);
-
-    public GamePlayer currentTurn;
 
     public GameHandler(Game game) {
         this.game = game;
@@ -41,7 +40,7 @@ public class GameHandler {
             game.broadcast("§aAll players have finished choosing their routes.");
             giveStartingCards(rand);
 
-            // Start with a random player
+            // Initiate the move cycle
             moveManager.startMove(game, game.gamePlayers.values().stream().toList().get(rand.nextInt(0, game.gamePlayers.size())));
         });
     }
@@ -57,16 +56,23 @@ public class GameHandler {
                 player.cards.merge(card, 1, Integer::sum);
             }
 
-            sendNewCardMessage(player.player, startingCards, "You received 4 starting cards:");
+            newCardMessage(player.player, startingCards, "You received 4 starting cards:");
         }
     }
 
-    public void sendNewCardMessage(Player player, Map<MapColor, Integer> cards, String title) {
+    public Component newCardMessage(Map<MapColor, Integer> cards, String title) {
+        return newCardMessage(null, cards, title);
+    }
+
+    public Component newCardMessage(Player player, Map<MapColor, Integer> cards, String title) {
         Component message = Component.text(title + "\n", NamedTextColor.YELLOW, TextDecoration.BOLD);
         for (Map.Entry<MapColor, Integer> entry : cards.entrySet()) {
             message = message.append(Component.text(entry.getValue() + "x ", NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false).append(entry.getKey().colored).append(Component.text(" card\n", NamedTextColor.GRAY)));
         }
-        player.sendMessage(message);
+        if (player != null) {
+            player.sendMessage(message);
+        }
+        return message;
     }
 
     public void setSelectActionHotbar(GamePlayer player) {
@@ -87,10 +93,18 @@ public class GameHandler {
         ActionManager actionManager = new ActionManager();
         PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.createGui(user.getInventory(), user, actionManager, true, null);
 
-        actionManager.addAction(user.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), name),  centered ? 4 : 8, GuiAction.ofClick(() -> {
-            ViewInfo viewInfo = new ViewInfo(game, user, oldEntry, player.equals(game.gameHandler.currentTurn));
-            user.openInventory(viewInfo.gui);
+        actionManager.setAction(user.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), name),  centered ? 4 : 8, GuiAction.ofClick(() -> {
+            if (player.overwriteAction != null) {
+                player.overwriteAction.run();
+            } else {
+                openViewInfo(user, oldEntry);
+            }
         }));
+    }
+
+    private void openViewInfo(Player player, PlayerGuiManager.PlayerEntry oldEntry) {
+        ViewInfo viewInfo = new ViewInfo(game, player, oldEntry, moveManager.currentMove != null && player.equals(moveManager.currentMove.player.player));
+        player.openInventory(viewInfo.gui);
     }
 
     public void clearHotbar(Player player) {

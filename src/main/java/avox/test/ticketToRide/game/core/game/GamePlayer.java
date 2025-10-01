@@ -3,6 +3,7 @@ package avox.test.ticketToRide.game.core.game;
 import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.game.core.DestinationCard;
 import avox.test.ticketToRide.game.core.MapColor;
+import avox.test.ticketToRide.listener.PlayerGuiManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class GamePlayer {
     public Player player;
@@ -29,6 +31,8 @@ public class GamePlayer {
     public int beaconSlot;
 
     private final ArrayList<DestinationCard> destinationCards = new ArrayList<>();
+
+    public Runnable overwriteAction;
 
     public GamePlayer(Game game, Player player) {
         this.player = player;

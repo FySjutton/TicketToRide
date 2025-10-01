@@ -3,6 +3,7 @@ package avox.test.ticketToRide.guis.game.move;
 import avox.test.ticketToRide.game.core.game.Game;
 import avox.test.ticketToRide.game.core.MapColor;
 import avox.test.ticketToRide.game.core.game.GamePlayer;
+import avox.test.ticketToRide.game.gameHandler.MoveManager;
 import avox.test.ticketToRide.guis.GuiAction;
 import avox.test.ticketToRide.util.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
@@ -13,17 +14,14 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PickCardGui extends InventoryGui {
-    private final HashMap<MapColor, Integer> picked = new HashMap<>();
-    private final MapColor[] board;
-    private int capacity = 2;
-
-    private Component finalMessage;
+    private final MoveManager.Move currentMove;
 
     public PickCardGui(Game game, GamePlayer player, PlayerGuiManager.PlayerEntry onClose) {
         super(player.player, 27, Component.text("Pick two cards"), onClose);
-        board = game.cardBoard.clone();
+        currentMove = game.gameHandler.moveManager.currentMove;
 
         updateGui(game, player);
     }
@@ -31,37 +29,32 @@ public class PickCardGui extends InventoryGui {
     private void updateGui(Game game, GamePlayer player) {
         ArrayList<MapColor> cardTypes = game.gameMap.getAllColors();
 
-        List<MapColor> pickedCards = picked.entrySet().stream().flatMap(e -> Collections.nCopies(e.getValue(), e.getKey()).stream()).toList();
-
-        if (!pickedCards.isEmpty()) {
-            MapColor card = pickedCards.getFirst();
+        if (!currentMove.picked.isEmpty()) {
+            MapColor card = currentMove.picked.getFirst().card();
             gui.setItem(3, GuiTools.format(new ItemStack(card.material), card.colored.append(GuiTools.getYellow(" Card"))));
         } else {
             gui.setItem(3, GuiTools.format(new ItemStack(Material.BARRIER), GuiTools.getYellow("Choose a card below!")));
         }
 
-        if (pickedCards.size() == 2) {
-            MapColor card = pickedCards.getFirst();
-            gui.setItem(5, GuiTools.format(new ItemStack(card.material), card.colored.append(GuiTools.getYellow(" Card"))));
-        } else {
-            gui.setItem(5, GuiTools.format(new ItemStack(Material.BARRIER), GuiTools.getYellow("Choose a card below!")));
-        }
+        // As the gui is closed instantly after selecting the second card, nothing except a barrier is needed
+        gui.setItem(5, GuiTools.format(new ItemStack(Material.BARRIER), GuiTools.getYellow("Choose a card below!")));
 
-        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.WHITE_DYE), GuiTools.getYellow("Pick random card")), 10, GuiAction.ofClick(() -> {
-            System.out.println("Here!");
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.WHITE_DYE), GuiTools.getYellow("Pick random card")), 10, GuiAction.ofClick(() -> {
             Random rand = new Random();
-            pick(game, player, cardTypes.get(rand.nextInt(0, cardTypes.size())), 1);
+            pick(game, currentMove, player, new CardSelection(cardTypes.get(rand.nextInt(0, cardTypes.size())), false), 1);
+            updateGui(game, player);
         }));
 
         for (int i = 0; i < 5; i++) {
-            MapColor color = board[i];
+            MapColor color = game.cardBoard[i];
             int finalI = i;
-            actionManager.addAction(gui, getBoardItem(game, color), 12 + i, GuiAction.ofClick(() -> {
-                if (pick(game, player, color, color.equals(game.gameMap.wildCard) ? 2 : 1)) {
-                    Component message = game.newBoardCard(finalI, board, true);
-                    if (finalMessage == null && message != null) {
-                        finalMessage = message;
+            actionManager.setAction(gui, getBoardItem(game, color), 12 + i, GuiAction.ofClick(() -> {
+                if (pick(game, currentMove, player, new CardSelection(color, true), color.equals(game.gameMap.wildCard) ? 2 : 1)) {
+                    Component message = game.newBoardCard(finalI, true);
+                    if (currentMove.finalMessage == null && message != null) {
+                        currentMove.finalMessage = message;
                     }
+                    updateGui(game, player);
                 }
             }));
         }
@@ -70,7 +63,7 @@ public class PickCardGui extends InventoryGui {
     private ItemStack getBoardItem(Game game, MapColor color) {
         List<Component> lore = new ArrayList<>();
         if (game.gameMap.wildCard.equals(color)) {
-            if (capacity >= 2) {
+            if (currentMove.capacity >= 2) {
                 lore.add(GuiTools.colorize("Picking this card costs two slots!", NamedTextColor.RED));
             } else {
                 lore.add(GuiTools.colorize("This card costs two slots, you only have 1 left!", NamedTextColor.RED));
@@ -81,31 +74,27 @@ public class PickCardGui extends InventoryGui {
         return GuiTools.format(new ItemStack(color.material), color.colored.append(GuiTools.getYellow(" Card")), lore);
     }
 
-    private boolean pick(Game game, GamePlayer player, MapColor card, int space) {
-        System.out.println("Here");
-        if ((capacity - space) >= 0) {
-            System.out.println("Here1");
-
-            capacity =- space;
-            picked.merge(card, 1, Integer::sum);
-            if (capacity == 0) {
-                System.out.println("Here2");
+    public static boolean pick(Game game, MoveManager.Move currentMove, GamePlayer player, CardSelection card, int space) {
+        if ((currentMove.capacity - space) >= 0) {
+            currentMove.capacity -= space;
+            currentMove.picked.add(card);
+            if (currentMove.capacity == 0) {
                 game.gameHandler.playerStateManager.get(player.player).finished = true;
-                game.cardBoard = board.clone();
-                for (Map.Entry<MapColor, Integer> playerCard : picked.entrySet()) {
-                    player.cards.merge(playerCard.getKey(), playerCard.getValue(), Integer::sum);
+                for (CardSelection playerCard : currentMove.picked) {
+                    player.cards.merge(playerCard.card, 1, Integer::sum);
                 }
-                game.gameHandler.sendNewCardMessage(player.player, picked, "You got:");
-                if (finalMessage != null) {
-                    game.broadcast(finalMessage);
+                game.gameHandler.newCardMessage(player.player, currentMove.picked.stream().collect(Collectors.toMap(s -> s.card, s -> 1, Integer::sum)), "You got:");
+                if (currentMove.finalMessage != null) {
+                    game.broadcast(currentMove.finalMessage);
                 }
                 player.player.closeInventory();
             }
-            updateGui(game, player);
             return true;
         } else {
             player.player.sendMessage("§cYou can't pick this card!");
         }
         return false;
     }
+
+    public record CardSelection(MapColor card, boolean fromUpface) {}
 }

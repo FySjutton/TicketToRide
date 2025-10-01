@@ -17,18 +17,25 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
+import java.util.*;
 
 public class PlayerGuiManager implements Listener {
     private static final HashMap<Player, PlayerEntry> entries = new HashMap<>();
 
-    public record PlayerEntry(Player player, GuiInventory inventory, ActionManager actionManager, PlayerEntry onCloseEntry) {}
+    public static final class PlayerEntry {
+        public GuiInventory inventory;
+        public ActionManager actionManager;
+        public PlayerEntry onCloseEntry;
+
+        public PlayerEntry(GuiInventory inventory, ActionManager actionManager, PlayerEntry onCloseEntry) {
+            this.inventory = inventory;
+            this.actionManager = actionManager;
+            this.onCloseEntry = onCloseEntry;
+        }
+    }
 
     public static PlayerEntry createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly, PlayerEntry onCloseEntry) {
-        PlayerEntry entry = new PlayerEntry(player, new GuiInventory(inventory, hotbarOnly), slotActions, onCloseEntry);
+        PlayerEntry entry = new PlayerEntry(new GuiInventory(inventory, hotbarOnly), slotActions, onCloseEntry);
         entries.put(player, entry);
         return entry;
     }
@@ -46,6 +53,10 @@ public class PlayerGuiManager implements Listener {
                 entries.remove(player);
             }
         }
+    }
+
+    public static void removeOnClose(Player player) {
+        entries.get(player).onCloseEntry = null;
     }
 
     public record GuiInventory(Inventory inventory, boolean hotbarOnly) {}

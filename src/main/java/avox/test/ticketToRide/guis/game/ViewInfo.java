@@ -5,6 +5,7 @@ import avox.test.ticketToRide.game.core.game.Game;
 import avox.test.ticketToRide.game.core.MapColor;
 import avox.test.ticketToRide.game.core.game.GamePlayer;
 import avox.test.ticketToRide.guis.GuiAction;
+import avox.test.ticketToRide.guis.game.move.PickCardGui;
 import avox.test.ticketToRide.util.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
 import avox.test.ticketToRide.listener.PlayerGuiManager;
@@ -22,8 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewInfo extends InventoryGui {
+    private final PlayerGuiManager.PlayerEntry oldState;
+
     public ViewInfo(Game game, Player user, PlayerGuiManager.PlayerEntry oldState, boolean chooseTurn) {
         super(user, chooseTurn ? 54 : 36, Component.text(chooseTurn ? "Pick an action" : "Game Info"), oldState);
+        this.oldState = oldState;
+
         GamePlayer player = game.gamePlayers.get(user);
         int startingIndex = chooseTurn ? 18 : 0;
         if (chooseTurn) {
@@ -33,7 +38,7 @@ public class ViewInfo extends InventoryGui {
         gui.setItem(startingIndex + 4, GuiTools.format(
                 new ItemStack(player.markerData.material).add(player.trains - 1),
                 GuiTools.getYellow("Trains left: ").append(GuiTools.colorize(player.trains + "/" + player.game.gameMap.startingTrains, NamedTextColor.GRAY)),
-                game.gamePlayers.values().stream().filter(gamePlayer -> !gamePlayer.equals(player)).map(gamePlayer -> gamePlayer.markerData.colored.append(GuiTools.getGray(" - " + gamePlayer.trains))).toList()
+                game.gamePlayers.values().stream().filter(gamePlayer -> !gamePlayer.equals(player)).map(gamePlayer -> gamePlayer.markerData.colored.append(GuiTools.getGray(" - " + gamePlayer.trains + "/" + player.game.gameMap.startingTrains))).toList()
         ));
 
         int startCardBoard = startingIndex + 11;
@@ -67,7 +72,7 @@ public class ViewInfo extends InventoryGui {
             }
         };
 
-        actionManager.addAction(gui, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Click to view cards on board")), startSlot + 8,
+        actionManager.setAction(gui, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Click to view cards on board")), startSlot + 8,
             GuiAction.ofClick(() -> {
                 if (!scrollableRow.currentlyShown.isEmpty()) {
                     game.gameHandler.destinationHandler.viewDestinationCards(scrollableRow.currentlyShown, game, player.player);
@@ -77,8 +82,12 @@ public class ViewInfo extends InventoryGui {
     }
 
     private void initiateChooseTurn(Game game, GamePlayer player) {
-        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.GRASS_BLOCK), GuiTools.getYellow("Place Route")), 2, GuiAction.ofClick(() -> game.gameHandler.moveManager.placeRoute()));
-        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards")), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(player)));
-        actionManager.addAction(gui, GuiTools.format(new ItemStack(Material.NAME_TAG), GuiTools.getYellow("Take Up Routes")), 6, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickRoutes()));
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.GRASS_BLOCK), GuiTools.getYellow("Place Route")), 2, GuiAction.ofClick(() -> {
+
+        }));
+
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards"), List.of(GuiTools.colorize("Once selected you can't change!", NamedTextColor.RED))), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(game, player, oldState)));
+
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.NAME_TAG), GuiTools.getYellow("Take Up Routes")), 6, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickRoutes()));
     }
 }

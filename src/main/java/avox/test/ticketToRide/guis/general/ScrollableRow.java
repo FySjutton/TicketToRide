@@ -49,7 +49,7 @@ public abstract class ScrollableRow<T> {
         int itemSlot = startSlot + (hasBack ? 1 : 0);
 
         if (hasBack) {
-            actionManager.addAction(inventory, GuiTools.format(new ItemStack(Material.ARROW), GuiTools.getYellow("Scroll back")), startSlot,
+            actionManager.setAction(inventory, GuiTools.format(new ItemStack(Material.ARROW), GuiTools.getYellow("Scroll back")), startSlot,
                     GuiAction.ofClick(() -> {
                         if (scroll == 2) scroll = 0;
                         else scroll--;
@@ -59,7 +59,7 @@ public abstract class ScrollableRow<T> {
         }
 
         if (hasForward) {
-            actionManager.addAction(inventory, GuiTools.format(new ItemStack(Material.ARROW), GuiTools.getYellow("Scroll forward")), startSlot + length - 1,
+            actionManager.setAction(inventory, GuiTools.format(new ItemStack(Material.ARROW), GuiTools.getYellow("Scroll forward")), startSlot + length - 1,
                 GuiAction.ofClick(() -> {
                     if (scroll == 0 && objects > length - 1) {
                         scroll = 2;
