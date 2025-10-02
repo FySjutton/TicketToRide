@@ -3,6 +3,7 @@ package avox.test.ticketToRide.game.core.game;
 import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.game.core.DestinationCard;
 import avox.test.ticketToRide.game.core.MapColor;
+import avox.test.ticketToRide.game.gameHandler.GameHandler;
 import avox.test.ticketToRide.listener.PlayerGuiManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,7 +33,7 @@ public class GamePlayer {
 
     private final ArrayList<DestinationCard> destinationCards = new ArrayList<>();
 
-    public Runnable overwriteAction;
+    public GameHandler.HotbarAction hotbarAction;
 
     public GamePlayer(Game game, Player player) {
         this.player = player;

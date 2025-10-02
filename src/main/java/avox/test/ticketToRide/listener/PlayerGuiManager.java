@@ -1,5 +1,8 @@
 package avox.test.ticketToRide.listener;
 
+import avox.test.ticketToRide.game.GameManager;
+import avox.test.ticketToRide.game.core.game.Game;
+import avox.test.ticketToRide.game.gameHandler.GameHandler;
 import avox.test.ticketToRide.guis.ActionManager;
 import avox.test.ticketToRide.guis.GuiAction;
 import org.bukkit.entity.Player;
@@ -25,17 +28,15 @@ public class PlayerGuiManager implements Listener {
     public static final class PlayerEntry {
         public GuiInventory inventory;
         public ActionManager actionManager;
-        public PlayerEntry onCloseEntry;
 
-        public PlayerEntry(GuiInventory inventory, ActionManager actionManager, PlayerEntry onCloseEntry) {
+        public PlayerEntry(GuiInventory inventory, ActionManager actionManager) {
             this.inventory = inventory;
             this.actionManager = actionManager;
-            this.onCloseEntry = onCloseEntry;
         }
     }
 
-    public static PlayerEntry createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly, PlayerEntry onCloseEntry) {
-        PlayerEntry entry = new PlayerEntry(new GuiInventory(inventory, hotbarOnly), slotActions, onCloseEntry);
+    public static PlayerEntry createGui(Inventory inventory, Player player, ActionManager slotActions, boolean hotbarOnly) {
+        PlayerEntry entry = new PlayerEntry(new GuiInventory(inventory, hotbarOnly), slotActions);
         entries.put(player, entry);
         return entry;
     }
@@ -47,16 +48,8 @@ public class PlayerGuiManager implements Listener {
     public static void removeGui(Player player) {
         PlayerEntry entry = entries.get(player);
         if (entry != null) {
-            if (entry.onCloseEntry != null) {
-                entries.put(player, entry.onCloseEntry);
-            } else {
-                entries.remove(player);
-            }
+            entries.remove(player);
         }
-    }
-
-    public static void removeOnClose(Player player) {
-        entries.get(player).onCloseEntry = null;
     }
 
     public record GuiInventory(Inventory inventory, boolean hotbarOnly) {}
@@ -136,10 +129,10 @@ public class PlayerGuiManager implements Listener {
 
         PlayerEntry entry = entries.get(player);
         if (!entry.inventory.hotbarOnly) {
-            if (entry.onCloseEntry != null) {
-                entries.put(player, entry.onCloseEntry);
-            } else {
-                entries.remove(player);
+            entries.remove(player);
+            Game game = GameManager.getGameByUser(player);
+            if (game != null) {
+                game.gameHandler.setHotbar(game.gamePlayers.get(player));
             }
         }
     }

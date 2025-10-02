@@ -7,7 +7,6 @@ import avox.test.ticketToRide.game.gameHandler.MoveManager;
 import avox.test.ticketToRide.guis.GuiAction;
 import avox.test.ticketToRide.util.GuiTools;
 import avox.test.ticketToRide.guis.InventoryGui;
-import avox.test.ticketToRide.listener.PlayerGuiManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -19,8 +18,8 @@ import java.util.stream.Collectors;
 public class PickCardGui extends InventoryGui {
     private final MoveManager.Move currentMove;
 
-    public PickCardGui(Game game, GamePlayer player, PlayerGuiManager.PlayerEntry onClose) {
-        super(player.player, 27, Component.text("Pick two cards"), onClose);
+    public PickCardGui(Game game, GamePlayer player) {
+        super(player.player, 27, Component.text("Pick two cards"));
         currentMove = game.gameHandler.moveManager.currentMove;
 
         updateGui(game, player);

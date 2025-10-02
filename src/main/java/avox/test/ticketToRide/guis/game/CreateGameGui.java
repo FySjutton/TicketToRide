@@ -31,7 +31,7 @@ public class CreateGameGui extends InventoryGui {
     private String error = "You must invite some players first!";
     
     public CreateGameGui(Player player, Component name, GameMap gameMap, BaseArena arena) {
-        super(player, 27, name, null);
+        super(player, 27, name);
 
         gui.setItem(11, GuiTools.format(
                 createHead(gameMap.headTexture),
@@ -90,7 +90,7 @@ public class CreateGameGui extends InventoryGui {
                 (result) -> {
                     player.closeInventory();
                     player.openInventory(gui);
-                    PlayerGuiManager.createGui(gui, player, actionManager, false, null);
+                    PlayerGuiManager.createGui(gui, player, actionManager, false);
                     opponents.clear();
                     opponents.addAll(result.stream().map(obj -> obj.element.player).toList());
                     if (opponents.isEmpty()) {

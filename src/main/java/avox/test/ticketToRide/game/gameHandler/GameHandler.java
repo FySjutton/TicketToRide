@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class GameHandler {
     public Game game;
@@ -32,8 +32,8 @@ public class GameHandler {
         Random rand = new Random();
 
         // Start by letting all players choose at least 2 cards
-        for (Player player : game.gamePlayers.keySet()) {
-            player.showTitle(Title.title(Component.text("Select Destination Cards"), Component.text("Select at least 2")));
+        for (GamePlayer player : game.gamePlayers.values()) {
+            player.player.showTitle(Title.title(Component.text("Select Destination Cards"), Component.text("Select at least 2")));
             destinationHandler.chooseDestinationCards(game, player, 2);
         }
         timerManager.startTimedAction(120, () -> {
@@ -75,35 +75,24 @@ public class GameHandler {
         return message;
     }
 
-    public void setSelectActionHotbar(GamePlayer player) {
-        setDefaultHotbar(player, true, GuiTools.getYellow("Select Action"));
-    }
-
-    public void setDefaultHotbar(Player player, boolean centered) {
-        setDefaultHotbar(game.gamePlayers.get(player), centered);
-    }
-
-    public void setDefaultHotbar(GamePlayer player, boolean centered) {
-        setDefaultHotbar(player, centered, GuiTools.getYellow("Show Info"));
-    }
-
-    private void setDefaultHotbar(GamePlayer player, boolean centered, Component name) {
+    public void setHotbar(GamePlayer player) {
         Player user = player.player;
         clearHotbar(user);
         ActionManager actionManager = new ActionManager();
-        PlayerGuiManager.PlayerEntry oldEntry = PlayerGuiManager.createGui(user.getInventory(), user, actionManager, true, null);
+        PlayerGuiManager.PlayerEntry entry = PlayerGuiManager.createGui(user.getInventory(), user, actionManager, true);
 
-        actionManager.setAction(user.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), name),  centered ? 4 : 8, GuiAction.ofClick(() -> {
-            if (player.overwriteAction != null) {
-                player.overwriteAction.run();
-            } else {
-                openViewInfo(user, oldEntry);
-            }
-        }));
+        actionManager.setAction(user.getInventory(), GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), player.hotbarAction.compassName), player.hotbarAction.compassSlot, GuiAction.ofClick(() -> player.hotbarAction.compassAction.run()));
+        if (player.hotbarAction.entry != null) {
+            player.hotbarAction.entry.accept(entry);
+        }
     }
 
-    private void openViewInfo(Player player, PlayerGuiManager.PlayerEntry oldEntry) {
-        ViewInfo viewInfo = new ViewInfo(game, player, oldEntry, moveManager.currentMove != null && player.equals(moveManager.currentMove.player.player));
+    public void setDefaultHotbar(GamePlayer player) {
+        player.hotbarAction = new HotbarAction(GuiTools.getYellow("Show Info"), () -> startViewInfo(player.player), 8, null);
+    }
+
+    public void startViewInfo(Player player) {
+        ViewInfo viewInfo = new ViewInfo(game, player, moveManager.currentMove != null && player.equals(moveManager.currentMove.player.player));
         player.openInventory(viewInfo.gui);
     }
 
@@ -113,19 +102,33 @@ public class GameHandler {
         }
     }
 
+    public static class HotbarAction {
+        public Component compassName;
+        public Runnable compassAction;
+        public int compassSlot;
+        public Consumer<PlayerGuiManager.PlayerEntry> entry;
+
+        public HotbarAction(Component compassName, Runnable compassAction, int compassSlot, Consumer<PlayerGuiManager.PlayerEntry> entry) {
+            this.compassName = compassName;
+            this.compassAction = compassAction;
+            this.compassSlot = compassSlot;
+            this.entry = entry;
+        }
+    }
+
     public static abstract class PlayerState {
         public Game game;
-        public Player player;
+        public GamePlayer player;
         public ActionManager actionManager;
         public boolean finished = false;
 
-        public PlayerState(Game game, Player player, ActionManager actionManager, boolean createGui) {
+        public PlayerState(Game game, GamePlayer player, ActionManager actionManager, boolean createGui) {
             this.game = game;
             this.player = player;
             this.actionManager = actionManager;
 
             if (createGui) {
-                PlayerGuiManager.createGui(player.getInventory(), player, actionManager, true, null);
+                PlayerGuiManager.createGui(player.player.getInventory(), player.player, actionManager, true);
             }
         }
 

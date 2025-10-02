@@ -23,11 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewInfo extends InventoryGui {
-    private final PlayerGuiManager.PlayerEntry oldState;
-
-    public ViewInfo(Game game, Player user, PlayerGuiManager.PlayerEntry oldState, boolean chooseTurn) {
-        super(user, chooseTurn ? 54 : 36, Component.text(chooseTurn ? "Pick an action" : "Game Info"), oldState);
-        this.oldState = oldState;
+    public ViewInfo(Game game, Player user, boolean chooseTurn) {
+        super(user, chooseTurn ? 54 : 36, Component.text(chooseTurn ? "Pick an action" : "Game Info"));
 
         GamePlayer player = game.gamePlayers.get(user);
         int startingIndex = chooseTurn ? 18 : 0;
@@ -75,7 +72,7 @@ public class ViewInfo extends InventoryGui {
         actionManager.setAction(gui, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Click to view cards on board")), startSlot + 8,
             GuiAction.ofClick(() -> {
                 if (!scrollableRow.currentlyShown.isEmpty()) {
-                    game.gameHandler.destinationHandler.viewDestinationCards(scrollableRow.currentlyShown, game, player.player);
+                    game.gameHandler.destinationHandler.viewDestinationCards(scrollableRow.currentlyShown, game, player);
                 }
             })
         );
@@ -86,7 +83,7 @@ public class ViewInfo extends InventoryGui {
 
         }));
 
-        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards"), List.of(GuiTools.colorize("Once selected you can't change!", NamedTextColor.RED))), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(game, player, oldState)));
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards"), List.of(GuiTools.colorize("Once selected you can't change!", NamedTextColor.RED))), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(game, player)));
 
         actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.NAME_TAG), GuiTools.getYellow("Take Up Routes")), 6, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickRoutes()));
     }

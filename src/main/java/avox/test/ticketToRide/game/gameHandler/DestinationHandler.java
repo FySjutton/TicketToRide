@@ -25,39 +25,38 @@ public class DestinationHandler {
         this.gameHandler = gameHandler;
     }
 
-    public void viewDestinationCards(List<DestinationCard> cards, Game game, Player player) {
+    public void viewDestinationCards(List<DestinationCard> cards, Game game, GamePlayer gamePlayer) {
+        Player player = gamePlayer.player;
         player.closeInventory();
-        ActionManager actionManager = new ActionManager();
-        Inventory inventory = player.getInventory();
-        PlayerGuiManager.createGui(inventory, player, actionManager, true, null);
-        gameHandler.clearHotbar(player);
 
-        for (int i = 0; i < cards.size(); i++) {
-            DestinationCard card = cards.get(i);
-            int finalI = i;
-            actionManager.setAction(inventory, GuiTools.format(
-                    new ItemStack(Material.NAME_TAG),
-                    GuiTools.getYellow(card.pointA.name() + " - " + card.pointB.name() + " (" + card.reward + " points)")
-            ), i, GuiAction.ofHold(() -> beaconHolder(player, finalI, card)));
-        }
+        gamePlayer.hotbarAction = new GameHandler.HotbarAction(GuiTools.getYellow("Return"), () -> {
+            gameHandler.setDefaultHotbar(gamePlayer);
+            gameHandler.setHotbar(gamePlayer);
+        }, 8, (entry) -> {
+            for (int i = 0; i < cards.size(); i++) {
+                DestinationCard card = cards.get(i);
+                int finalI = i;
+                entry.actionManager.setAction(entry.inventory.inventory(), GuiTools.format(
+                        new ItemStack(Material.NAME_TAG),
+                        GuiTools.getYellow(card.pointA.name() + " - " + card.pointB.name() + " (" + card.reward + " points)")
+                ), i, GuiAction.ofHold(() -> beaconHolder(player, finalI, card)));
+            }
 
-        for (int i = cards.size(); i < 9; i++) {
-            actionManager.setAction(i, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
-        }
-
-        actionManager.setAction(inventory, GuiTools.format(GuiTools.clearCompass(new ItemStack(Material.COMPASS)), GuiTools.getYellow("Return")), 8, GuiAction.ofClick(() -> {
-            PlayerGuiManager.removeGui(player);
-            gameHandler.setDefaultHotbar(player, false);
-        }));
+            for (int i = cards.size(); i < 9; i++) {
+                entry.actionManager.addAction(i, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
+            }
+        });
+        gameHandler.setHotbar(gamePlayer);
     }
 
-    public void chooseDestinationCards(Game game, Player player, int minimumAccepts) {
+    public void chooseDestinationCards(Game game, GamePlayer player, int minimumAccepts) {
         chooseDestinationCards(game, player, minimumAccepts, 3);
     }
 
-    public void chooseDestinationCards(Game game, Player player, int minimumAccepts, int maximumAccepts) {
+    public void chooseDestinationCards(Game game, GamePlayer gamePlayer, int minimumAccepts, int maximumAccepts) {
+        Player player = gamePlayer.player;
         ActionManager actionManager = new ActionManager();
-        DestinationSelectionAction state = new DestinationSelectionAction(game, player, actionManager);
+        DestinationSelectionAction state = new DestinationSelectionAction(game, gamePlayer, actionManager);
         gameHandler.playerStateManager.put(player, state);
 
         PlayerInventory inventory = player.getInventory();
@@ -85,7 +84,7 @@ public class DestinationHandler {
                         player.sendMessage(state.error);
                     } else {
                         List<DestinationCard> acceptedCards = state.toggles.keySet().stream().filter(state.toggles::get).toList();
-                        finished(game, player, state, acceptedCards);
+                        finished(game, gamePlayer, state, acceptedCards);
                     }
                 })
         );
@@ -102,7 +101,7 @@ public class DestinationHandler {
                 new ItemStack(Material.NAME_TAG),
                 GuiTools.getYellow(card.pointA.name() + " - " + card.pointB.name() + " (" + card.reward + " points)")
         );
-        state.actionManager.addAction(inventory, mainItem, slot, GuiAction.ofHold(() -> beaconHolder(state.player, toggleSlot, card)));
+        state.actionManager.addAction(inventory, mainItem, slot, GuiAction.ofHold(() -> beaconHolder(state.player.player, toggleSlot, card)));
         state.actionManager.addAction(slot, GuiAction.ofClick(() -> toggleCard(state, inventory, toggleSlot, card, minimumAccepts, maximumAccepts)));
 
         ItemStack toggleItem = GuiTools.format(
@@ -110,7 +109,7 @@ public class DestinationHandler {
                 GuiTools.getYellow("Click to toggle")
         );
         state.actionManager.addAction(inventory, toggleItem, toggleSlot, GuiAction.ofClick(() -> toggleCard(state, inventory, toggleSlot, card, minimumAccepts, maximumAccepts)));
-        state.actionManager.addAction(toggleSlot, GuiAction.ofHold(() -> beaconHolder(state.player, toggleSlot, card)));
+        state.actionManager.addAction(toggleSlot, GuiAction.ofHold(() -> beaconHolder(state.player.player, toggleSlot, card)));
     }
 
     private void toggleCard(DestinationSelectionAction state, Inventory inventory, int slot, DestinationCard card, int minimumAccepts, int maximumAccepts) {
@@ -154,14 +153,14 @@ public class DestinationHandler {
         inventory.setItem(8, GuiTools.format(finishBtn.withType(success ? Material.LIME_CONCRETE : Material.RED_CONCRETE), GuiTools.colorize("Finished!", success ? NamedTextColor.GREEN : NamedTextColor.RED)));
     }
 
-    private static void finished(Game game, Player player, DestinationSelectionAction state, List<DestinationCard> acceptedCards) {
-        PlayerGuiManager.removeGui(player);
+    private static void finished(Game game, GamePlayer player, DestinationSelectionAction state, List<DestinationCard> acceptedCards) {
         for (int i = 0; i < 9; i++) {
-            player.getInventory().setItem(i, null);
+            player.player.getInventory().setItem(i, null);
         }
-        game.gamePlayers.get(player).getDestinationCards().addAll(acceptedCards);
+        game.gamePlayers.get(player.player).getDestinationCards().addAll(acceptedCards);
         state.finished = true;
-        game.gameHandler.setDefaultHotbar(player, false);
+        game.gameHandler.setDefaultHotbar(player);
+        game.gameHandler.setHotbar(player);
     }
 
     private void beaconHolder(Player player, int slot, DestinationCard card) {
@@ -182,7 +181,7 @@ public class DestinationHandler {
         public final Map<Integer, DestinationCard> cardSlots = new HashMap<>();
         public String error = "§cYou must toggle all!";
 
-        public DestinationSelectionAction(Game game, Player player, ActionManager actionManager) {
+        public DestinationSelectionAction(Game game, GamePlayer player, ActionManager actionManager) {
             super(game, player, actionManager, true);
         }
 

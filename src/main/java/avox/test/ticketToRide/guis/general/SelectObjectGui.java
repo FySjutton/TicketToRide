@@ -27,7 +27,7 @@ public class SelectObjectGui<T> extends InventoryGui {
     private boolean multiselect;
 
     public SelectObjectGui(Player player, Component name) {
-        super(player, 36, name, null);
+        super(player, 36, name);
     }
 
     public void init(ArrayList<ObjectEntry> options, Consumer<ObjectEntry> resultAction) {

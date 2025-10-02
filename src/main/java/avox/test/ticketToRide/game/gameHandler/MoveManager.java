@@ -10,9 +10,7 @@ import avox.test.ticketToRide.util.GuiTools;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import java.util.AbstractMap.SimpleEntry;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,15 +50,17 @@ public class MoveManager {
         game.broadcast(Component.text(player.player.getName() + "'s turn!", NamedTextColor.GREEN));
         player.player.showTitle(Title.title(Component.text("It's your turn!", NamedTextColor.GREEN), Component.empty()));
 
-        gameHandler.setSelectActionHotbar(player);
+        player.hotbarAction = new GameHandler.HotbarAction(GuiTools.getYellow("Choose Action"), () -> gameHandler.startViewInfo(player.player), 4, null);
+
+        gameHandler.setHotbar(player);
         gameHandler.playerStateManager.put(player.player, new MoveAction(game, player, PlayerGuiManager.getGui(player.player).actionManager));
 
         gameHandler.timerManager.startTimedAction(120, () -> {
-            player.overwriteAction = null;
+            gameHandler.setDefaultHotbar(player);
             if (currentMove.onFinish != null) {
                 currentMove.onFinish.run();
             }
-            gameHandler.setDefaultHotbar(player, false);
+            gameHandler.setHotbar(player);
             game.broadcast(currentMove.actionMessage, player.player);
 
             List<Player> players = new ArrayList<>(game.gamePlayers.keySet());
@@ -71,7 +71,7 @@ public class MoveManager {
         });
     }
 
-    public void pickCards(Game game, GamePlayer player, PlayerGuiManager.PlayerEntry oldState) {
+    public void pickCards(Game game, GamePlayer player) {
         currentMove.onFinish = () -> {
             Map<MapColor, Integer> frontCards = currentMove.picked.stream().filter(PickCardGui.CardSelection::fromUpface).collect(Collectors.toMap(PickCardGui.CardSelection::card, s -> 1, Integer::sum));
             int amountFrontUp = currentMove.picked.stream().filter(PickCardGui.CardSelection::fromUpface).toList().size();
@@ -80,13 +80,12 @@ public class MoveManager {
             }
             currentMove.actionMessage = gameHandler.newCardMessage(frontCards, player.player.getName() + " picked up the following cards:");
         };
-        player.overwriteAction = () -> {
-            PlayerGuiManager.removeOnClose(player.player);
+        player.hotbarAction.compassAction = () -> {
             player.player.closeInventory();
-            PickCardGui pickCardGui = new PickCardGui(player.game, player, oldState);
+            PickCardGui pickCardGui = new PickCardGui(player.game, player);
             player.player.openInventory(pickCardGui.gui);
         };
-        player.overwriteAction.run();
+        player.hotbarAction.compassAction.run();
     }
 
     public void placeRoute() {
@@ -98,11 +97,8 @@ public class MoveManager {
     }
 
     public class MoveAction extends GameHandler.PlayerState {
-        private final GamePlayer player;
-
         public MoveAction(Game game, GamePlayer player, ActionManager actionManager) {
-            super(game, player.player, actionManager, false);
-            this.player = player;
+            super(game, player, actionManager, false);
         }
 
         @Override
