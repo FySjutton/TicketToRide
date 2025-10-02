@@ -28,8 +28,8 @@ public class PickCardGui extends InventoryGui {
     private void updateGui(Game game, GamePlayer player) {
         ArrayList<MapColor> cardTypes = game.gameMap.getAllColors();
 
-        if (!currentMove.picked.isEmpty()) {
-            MapColor card = currentMove.picked.getFirst().card();
+        if (!currentMove.pickedColorCards.isEmpty()) {
+            MapColor card = currentMove.pickedColorCards.getFirst().card();
             gui.setItem(3, GuiTools.format(new ItemStack(card.material), card.colored.append(GuiTools.getYellow(" Card"))));
         } else {
             gui.setItem(3, GuiTools.format(new ItemStack(Material.BARRIER), GuiTools.getYellow("Choose a card below!")));
@@ -76,13 +76,13 @@ public class PickCardGui extends InventoryGui {
     public static boolean pick(Game game, MoveManager.Move currentMove, GamePlayer player, CardSelection card, int space) {
         if ((currentMove.capacity - space) >= 0) {
             currentMove.capacity -= space;
-            currentMove.picked.add(card);
+            currentMove.pickedColorCards.add(card);
             if (currentMove.capacity == 0) {
                 game.gameHandler.playerStateManager.get(player.player).finished = true;
-                for (CardSelection playerCard : currentMove.picked) {
+                for (CardSelection playerCard : currentMove.pickedColorCards) {
                     player.cards.merge(playerCard.card, 1, Integer::sum);
                 }
-                game.gameHandler.newCardMessage(player.player, currentMove.picked.stream().collect(Collectors.toMap(s -> s.card, s -> 1, Integer::sum)), "You got:");
+                game.gameHandler.newCardMessage(player.player, currentMove.pickedColorCards.stream().collect(Collectors.toMap(s -> s.card, s -> 1, Integer::sum)), "You got:");
                 if (currentMove.finalMessage != null) {
                     game.broadcast(currentMove.finalMessage);
                 }

@@ -1,5 +1,6 @@
 package avox.test.ticketToRide.game.gameHandler;
 
+import avox.test.ticketToRide.game.core.DestinationCard;
 import avox.test.ticketToRide.game.core.MapColor;
 import avox.test.ticketToRide.game.core.game.Game;
 import avox.test.ticketToRide.game.core.game.GamePlayer;
@@ -23,17 +24,20 @@ public class MoveManager {
         public GamePlayer player;
 
         // Pick card variables
-        public ArrayList<PickCardGui.CardSelection> picked;
+        public ArrayList<PickCardGui.CardSelection> pickedColorCards;
         public int capacity;
         public Component finalMessage;
+
+        // Pick destination card variables
+        public List<DestinationCard> selectedDestinationCards;
 
         public Component actionMessage;
         public Runnable onFinish;
 
-        public Move(Game game, GamePlayer player) {
+        public Move(GamePlayer player) {
             this.player = player;
 
-            picked = new ArrayList<>();
+            pickedColorCards = new ArrayList<>();
             capacity = 2;
             finalMessage = null;
         }
@@ -44,7 +48,7 @@ public class MoveManager {
     }
 
     public void startMove(Game game, GamePlayer player) {
-        currentMove = new Move(game, player);
+        currentMove = new Move(player);
 
         game.broadcastTitle(Component.text(player.player.getName() + "'s turn!", NamedTextColor.GREEN), Component.empty(), player.player);
         game.broadcast(Component.text(player.player.getName() + "'s turn!", NamedTextColor.GREEN));
@@ -71,12 +75,12 @@ public class MoveManager {
         });
     }
 
-    public void pickCards(Game game, GamePlayer player) {
+    public void pickCards(GamePlayer player) {
         currentMove.onFinish = () -> {
-            Map<MapColor, Integer> frontCards = currentMove.picked.stream().filter(PickCardGui.CardSelection::fromUpface).collect(Collectors.toMap(PickCardGui.CardSelection::card, s -> 1, Integer::sum));
-            int amountFrontUp = currentMove.picked.stream().filter(PickCardGui.CardSelection::fromUpface).toList().size();
-            if (currentMove.picked.size() != amountFrontUp) {
-                frontCards.put(new MapColor("Secret"), currentMove.picked.size() - amountFrontUp);
+            Map<MapColor, Integer> frontCards = currentMove.pickedColorCards.stream().filter(PickCardGui.CardSelection::fromUpface).collect(Collectors.toMap(PickCardGui.CardSelection::card, s -> 1, Integer::sum));
+            int amountFrontUp = currentMove.pickedColorCards.stream().filter(PickCardGui.CardSelection::fromUpface).toList().size();
+            if (currentMove.pickedColorCards.size() != amountFrontUp) {
+                frontCards.put(new MapColor("Secret"), currentMove.pickedColorCards.size() - amountFrontUp);
             }
             currentMove.actionMessage = gameHandler.newCardMessage(frontCards, player.player.getName() + " picked up the following cards:");
         };
@@ -92,8 +96,14 @@ public class MoveManager {
 
     }
 
-    public void pickRoutes() {
+    public void pickRoutes(GamePlayer player) {
+        currentMove.onFinish = () -> {
+            currentMove.actionMessage = GuiTools.colorize(player.player.getName() + " picked up " + currentMove.selectedDestinationCards.size() + " cards!", NamedTextColor.GREEN);
+            player.player.sendMessage(GuiTools.colorize("Turn finished! " + currentMove.selectedDestinationCards.size() + " cards selected!", NamedTextColor.GREEN));
+        };
 
+        player.player.sendMessage(GuiTools.colorize("You selected pick up destination cards! You must save at least one, but you can save more if you'd like!", NamedTextColor.GREEN));
+        gameHandler.destinationHandler.chooseDestinationCards(player.game, player, 1);
     }
 
     public class MoveAction extends GameHandler.PlayerState {

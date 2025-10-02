@@ -83,8 +83,8 @@ public class ViewInfo extends InventoryGui {
 
         }));
 
-        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Take Up Cards"), List.of(GuiTools.colorize("Once selected you can't change!", NamedTextColor.RED))), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(game, player)));
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Pick Up Cards"), List.of(GuiTools.colorize("Once selected you can't switch!", NamedTextColor.RED))), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(player)));
 
-        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.NAME_TAG), GuiTools.getYellow("Take Up Routes")), 6, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickRoutes()));
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.NAME_TAG), GuiTools.getYellow("Pick Up Routes"), List.of(GuiTools.colorize("Once selected you can't switch!", NamedTextColor.RED))), 6, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickRoutes(player)));
     }
 }

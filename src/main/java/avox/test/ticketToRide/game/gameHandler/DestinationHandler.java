@@ -55,6 +55,7 @@ public class DestinationHandler {
 
     public void chooseDestinationCards(Game game, GamePlayer gamePlayer, int minimumAccepts, int maximumAccepts) {
         Player player = gamePlayer.player;
+        player.closeInventory();
         ActionManager actionManager = new ActionManager();
         DestinationSelectionAction state = new DestinationSelectionAction(game, gamePlayer, actionManager);
         gameHandler.playerStateManager.put(player, state);
@@ -158,6 +159,11 @@ public class DestinationHandler {
             player.player.getInventory().setItem(i, null);
         }
         game.gamePlayers.get(player.player).getDestinationCards().addAll(acceptedCards);
+
+        MoveManager moveManager = game.gameHandler.moveManager;
+        if (moveManager.currentMove != null && moveManager.currentMove.player.equals(player)) {
+            moveManager.currentMove.selectedDestinationCards = acceptedCards;
+        }
         state.finished = true;
         game.gameHandler.setDefaultHotbar(player);
         game.gameHandler.setHotbar(player);
