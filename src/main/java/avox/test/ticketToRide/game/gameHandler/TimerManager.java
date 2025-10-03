@@ -3,6 +3,7 @@ package avox.test.ticketToRide.game.gameHandler;
 import avox.test.ticketToRide.util.GuiTools;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import static avox.test.ticketToRide.TicketToRide.plugin;
 
@@ -11,9 +12,11 @@ public class TimerManager {
     private Runnable nextAction;
     private int timer;
 
+    public final BukkitTask task;
+
     public TimerManager(GameHandler handler) {
         this.handler = handler;
-        Bukkit.getScheduler().runTaskTimer(plugin, this::count, 0L, 20L);
+        this.task = Bukkit.getScheduler().runTaskTimer(plugin, this::count, 0L, 20L);
     }
 
     public void startTimedAction(int timer, Runnable onceFinished) {

@@ -81,6 +81,7 @@ public class GameManager {
             playerStateManager.restorePlayer(player);
             PlayerGuiManager.removeGui(player);
         }
+        game.gameHandler.timerManager.task.cancel();
         ArenaManager.unloadAndDeleteArenaWorld(game.arena.mapID);
     }
 

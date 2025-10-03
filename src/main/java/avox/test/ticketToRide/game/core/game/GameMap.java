@@ -60,6 +60,9 @@ public class GameMap {
     }
 
     public MapColor getColor(String color) {
+        if (color.equals("gray")) {
+            return wildCard;
+        }
         return colors.stream().filter(c -> c.name.equalsIgnoreCase(color)).findFirst().orElse(null);
     }
 

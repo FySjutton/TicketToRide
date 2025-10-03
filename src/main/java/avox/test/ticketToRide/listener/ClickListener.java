@@ -105,7 +105,7 @@ public class ClickListener implements Listener {
 
                     boolean hitTile = game.gameMap.tileMaps.get(tile.rotation).hit(relativeX, relativeY);
                     if (hitTile) {
-                        player.sendMessage("§dClicked tile!");
+                        game.gameHandler.moveManager.routeClicked(route, player);
                     }
                 }
             }

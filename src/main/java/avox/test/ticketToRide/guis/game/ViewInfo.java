@@ -44,7 +44,7 @@ public class ViewInfo extends InventoryGui {
             gui.setItem(startCardBoard + i, GuiTools.format(new ItemStack(card.material), card.colored.decorate(TextDecoration.BOLD).append(GuiTools.getYellow(" Card")), List.of(GuiTools.getGray("The face up cards."))));
         }
 
-        new ScrollableRow<>(actionManager, gui, startingIndex + 18, 9, new ArrayList<>(player.cards.keySet()), null) {
+        new ScrollableRow<>(actionManager, gui, startingIndex + 18, 9, new ArrayList<>(player.cards.keySet()), null, true) {
             @Override
             public ItemStack getSlotItem(MapColor color) {
                 int cards = player.cards.get(color);
@@ -59,7 +59,7 @@ public class ViewInfo extends InventoryGui {
         };
 
         int startSlot = startingIndex + 27;
-        ScrollableRow<DestinationCard> scrollableRow = new ScrollableRow<>(actionManager, gui, startSlot, 8, player.getDestinationCards(), GuiTools.getYellow("Empty Destination Card Slot")) {
+        ScrollableRow<DestinationCard> scrollableRow = new ScrollableRow<>(actionManager, gui, startSlot, 8, player.getDestinationCards(), GuiTools.getYellow("Empty Destination Card Slot"), false) {
             @Override
             public ItemStack getSlotItem(DestinationCard item) {
                 return GuiTools.format(
@@ -79,9 +79,7 @@ public class ViewInfo extends InventoryGui {
     }
 
     private void initiateChooseTurn(Game game, GamePlayer player) {
-        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.GRASS_BLOCK), GuiTools.getYellow("Place Route")), 2, GuiAction.ofClick(() -> {
-
-        }));
+        actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.GRASS_BLOCK), GuiTools.getYellow("Place Route")), 2, GuiAction.ofClick(() -> game.gameHandler.moveManager.placeRoute(player)));
 
         actionManager.setAction(gui, GuiTools.format(new ItemStack(Material.WHITE_WOOL), GuiTools.getYellow("Pick Up Cards"), List.of(GuiTools.colorize("Once selected you can't switch!", NamedTextColor.RED))), 4, GuiAction.ofClick(() -> game.gameHandler.moveManager.pickCards(player)));
 

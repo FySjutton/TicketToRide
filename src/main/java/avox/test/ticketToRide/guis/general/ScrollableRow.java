@@ -21,13 +21,16 @@ public abstract class ScrollableRow<T> {
     public ArrayList<T> currentlyShown;
     private int scroll = 0;
 
-    public ScrollableRow(ActionManager actionManager, Inventory gui, int startSlot, int length, ArrayList<T> objectList, Component emptySlotName) {
+    public boolean centered;
+
+    public ScrollableRow(ActionManager actionManager, Inventory gui, int startSlot, int length, ArrayList<T> objectList, Component emptySlotName, boolean centered) {
         this.actionManager = actionManager;
         this.objectList = objectList;
         this.inventory = gui;
         this.startSlot = startSlot;
         this.length = length;
         this.emptySlotName = emptySlotName;
+        this.centered = centered;
 
         updateRow();
     }
@@ -71,16 +74,30 @@ public abstract class ScrollableRow<T> {
             );
         }
 
-        for (int i = 0; i < cardSlots; i++) {
-            actionManager.removeAction(itemSlot);
-            int cardIndex = scroll + i;
-            if (cardIndex < objects) {
-                T object = objectList.get(cardIndex);
-                inventory.setItem(itemSlot, getSlotItem(object));
-            } else if (emptySlotName != null) {
-                inventory.setItem(itemSlot, GuiTools.format(new ItemStack(Material.BARRIER), emptySlotName));
+        if (!hasBack && !hasForward && centered) {
+            new CenteredRow<>(inventory, startSlot, length, objectList) {
+                @Override
+                public ItemStack getSlotItem(T item) {
+                    return ScrollableRow.this.getSlotItem(item);
+                }
+
+                @Override
+                public GuiAction getGuiAction(T object) {
+                    return null;
+                }
+            };
+        } else {
+            for (int i = 0; i < cardSlots; i++) {
+                actionManager.removeAction(itemSlot);
+                int cardIndex = scroll + i;
+                if (cardIndex < objects) {
+                    T object = objectList.get(cardIndex);
+                    inventory.setItem(itemSlot, getSlotItem(object));
+                } else if (emptySlotName != null) {
+                    inventory.setItem(itemSlot, GuiTools.format(new ItemStack(Material.BARRIER), emptySlotName));
+                }
+                itemSlot++;
             }
-            itemSlot++;
         }
 
         ArrayList<T> visibleObjects = new ArrayList<>();
