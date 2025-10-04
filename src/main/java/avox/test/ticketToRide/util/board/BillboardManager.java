@@ -16,7 +16,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class BillboardManager {
-    public void summonBillboards(Arena arena) {
+    public static void summonBillboards(Arena arena) {
         spawnBillboardSection(arena.world, arena.billboards.get(0),
                 "Goal", List.of(
                         "Each player starts with 45 trains.",
@@ -67,7 +67,7 @@ public class BillboardManager {
         );
     }
 
-    private void spawnBillboardSection(World world, Location location, String heading, List<String> lines) {
+    private static void spawnBillboardSection(World world, Location location, String heading, List<String> lines) {
         System.out.println(location);
         spawnLine(world, location,
                 Component.text(heading)
@@ -79,7 +79,7 @@ public class BillboardManager {
         spawnLine(world, location, Component.text(bodyText), 1.0f, lines.size(), true, false);
     }
 
-    public TextDisplay spawnLine(World world, Location loc, Component text, float scale, int lines, boolean fixed, boolean background) {
+    public static TextDisplay spawnLine(World world, Location loc, Component text, float scale, int lines, boolean fixed, boolean background) {
         return world.spawn(loc, TextDisplay.class, display -> {
             if (fixed) {
                 display.setBillboard(Display.Billboard.FIXED);

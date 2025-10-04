@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class MapManager {
-    public void generateAndDisplay(World world, File imageFile, Location baseLocation, int tilesX, int tilesY) {
+    public static void generateAndDisplay(World world, File imageFile, Location baseLocation, int tilesX, int tilesY) {
         int tileSize = 128;
         int totalWidth = tileSize * tilesX;
         int totalHeight = tileSize * tilesY;

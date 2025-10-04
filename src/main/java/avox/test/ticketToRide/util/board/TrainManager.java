@@ -14,12 +14,12 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class TrainManager {
-    public void spawnSmallTrainCar(Arena arena, GameMap map, Route.Tile tile) {
+    public static void spawnSmallTrainCar(Arena arena, GameMap map, Route.Tile tile, Material material) {
         GameMap.TileMap tileMap = map.tileMaps.get(tile.rotation);
         Location spawnLocation = map.getStartLocation(arena).clone().add((double) (tile.x + tileMap.centerX) / 128, 0.05, (double) (tile.y + tileMap.centerY) / 128);
 
         ItemDisplay cart = (ItemDisplay) arena.world.spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
-        cart.setItemStack(new ItemStack(Material.RED_CONCRETE));
+        cart.setItemStack(new ItemStack(material));
 
         float pixel = 1f / 128f;
 

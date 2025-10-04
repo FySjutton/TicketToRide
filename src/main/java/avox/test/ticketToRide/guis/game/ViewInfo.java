@@ -56,6 +56,11 @@ public class ViewInfo extends InventoryGui {
                 }
                 return GuiTools.format(stack, GuiTools.getYellow("Card ").append(color.colored.decoration(TextDecoration.ITALIC, false).decorate(TextDecoration.BOLD)).append(GuiTools.getGray(" (" + cards + ")")));
             }
+
+            @Override
+            public GuiAction getGuiAction(MapColor object) {
+                return null;
+            }
         };
 
         int startSlot = startingIndex + 27;
@@ -66,6 +71,11 @@ public class ViewInfo extends InventoryGui {
                         new ItemStack(item.finished ? Material.LIME_CONCRETE : Material.RED_CONCRETE),
                         GuiTools.getYellow(item.pointA.name() + " - " + item.pointB.name() + " (" + item.reward + " points)")
                 );
+            }
+
+            @Override
+            public GuiAction getGuiAction(DestinationCard object) {
+                return null;
             }
         };
 

@@ -14,8 +14,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MapManager {
     public static ArrayList<GameMap> maps = new ArrayList<>();
@@ -71,6 +74,14 @@ public class MapManager {
             data.get("head_texture").getAsString(),
             new MapColor("wildcard", Material.valueOf(data.get("wildcard").getAsString().toUpperCase()), MapColor.coloredTextFromString("wildcard", true))
         );
+
+        JsonArray routePoints = data.getAsJsonArray("route_points");
+        map.routePoints = new HashMap<>(IntStream.range(0, routePoints.size())
+            .boxed()
+            .collect(Collectors.toMap(
+                    i -> i,
+                    i -> routePoints.get(i).getAsInt()
+        )));
 
         JsonObject colors = data.getAsJsonObject("colors");
         for (Map.Entry<String, JsonElement> color : colors.asMap().entrySet()) {

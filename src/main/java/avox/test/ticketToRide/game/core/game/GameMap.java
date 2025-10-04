@@ -27,6 +27,7 @@ public class GameMap {
     public HashMap<Integer, TileMap> tileMaps = new HashMap<>();
     public HashMap<Integer, PointSquare> pointBoard = new HashMap<>();
     public ArrayList<LengthPoints> mapPoints;
+    public HashMap<Integer, Integer> routePoints;
 
     public int height;
     public int width;
@@ -49,6 +50,7 @@ public class GameMap {
         this.tilesY = tilesY;
         this.pointBoardSize = pointBoardSize;
         this.startingTrains = startingTrains;
+        this.startingTrains = 20; // TODO: Remove this test line
         this.headTexture = headTexture;
         this.wildCard = wildCard;
     }

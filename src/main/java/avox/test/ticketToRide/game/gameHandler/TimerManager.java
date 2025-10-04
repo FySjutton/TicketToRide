@@ -12,6 +12,7 @@ public class TimerManager {
     private Runnable nextAction;
     private int timer;
 
+    public int delay = -1;
     public final BukkitTask task;
 
     public TimerManager(GameHandler handler) {
@@ -30,7 +31,14 @@ public class TimerManager {
         boolean allFinished = handler.playerStateManager.values().stream().allMatch(a -> a.finished);
         if (allFinished) {
             handler.playerStateManager.clear();
-            nextAction.run();
+            if (delay != -1) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    nextAction.run();
+                    delay = -1;
+                }, delay);
+            } else {
+                nextAction.run();
+            }
             return;
         }
 

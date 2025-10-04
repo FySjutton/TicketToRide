@@ -45,12 +45,16 @@ public class GameHandler {
         });
     }
 
+    public void gameFinished() {
+        game.broadcastTitle(GuiTools.colorize("Game over!", NamedTextColor.GREEN), Component.empty());
+    }
+
     private void giveStartingCards(Random rand) {
         List<MapColor> cards = game.gameMap.getAllColors();
 
         for (GamePlayer player : game.gamePlayers.values()) {
             HashMap<MapColor, Integer> startingCards = new HashMap<>();
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 40; i++) { // TODO: Remove this testing line (change to 4)
                 MapColor card = cards.get(rand.nextInt(cards.size()));
                 startingCards.merge(card, 1, Integer::sum);
                 player.cards.merge(card, 1, Integer::sum);

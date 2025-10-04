@@ -30,6 +30,8 @@ public class DestinationHandler {
         player.closeInventory();
 
         gamePlayer.hotbarAction = new GameHandler.HotbarAction(GuiTools.getYellow("Return"), () -> {
+            gamePlayer.beaconSlot = -1;
+            gamePlayer.clearBeacons();
             gameHandler.setDefaultHotbar(gamePlayer);
             gameHandler.setHotbar(gamePlayer);
         }, 8, (entry) -> {
@@ -71,7 +73,7 @@ public class DestinationHandler {
             actionManager.setAction(slot, GuiAction.ofHold(() -> game.gamePlayers.get(player).clearBeacons()));
         }
 
-        actionManager.setAction(
+        actionManager.addAction(
                 inventory,
                 GuiTools.format(
                     new ItemStack(Material.RED_CONCRETE),
@@ -155,10 +157,12 @@ public class DestinationHandler {
     }
 
     private static void finished(Game game, GamePlayer player, DestinationSelectionAction state, List<DestinationCard> acceptedCards) {
+        player.beaconSlot = -1;
+        player.clearBeacons();
         for (int i = 0; i < 9; i++) {
             player.player.getInventory().setItem(i, null);
         }
-        game.gamePlayers.get(player.player).getDestinationCards().addAll(acceptedCards);
+        player.getDestinationCards().addAll(acceptedCards);
 
         MoveManager moveManager = game.gameHandler.moveManager;
         if (moveManager.currentMove != null && moveManager.currentMove.player.equals(player)) {

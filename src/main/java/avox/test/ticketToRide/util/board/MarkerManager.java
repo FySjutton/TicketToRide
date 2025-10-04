@@ -13,7 +13,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class MarkerManager {
-    public ItemDisplay spawnMarker(Game game, Material material) {
+    public static ItemDisplay spawnMarker(Game game, Material material) {
         ItemDisplay itemDisplay = (ItemDisplay) game.arena.world.spawnEntity(game.arena.mapStartPosition, EntityType.ITEM_DISPLAY);
         itemDisplay.setItemStack(new ItemStack(material));
         itemDisplay.setTransformation(new Transformation(
@@ -29,7 +29,7 @@ public class MarkerManager {
         return itemDisplay;
     }
 
-    public void reposition(Game game, GamePlayer player, int points) {
+    public static void reposition(Game game, GamePlayer player, int points) {
         ItemDisplay marker = player.marker;
         int square = getSquare(points % game.gameMap.pointBoardSize);
         int stacked = Math.toIntExact(game.gamePlayers.values().stream().filter(p -> p.points != -1 && p.player != player.player && getSquare(p.points % game.gameMap.pointBoardSize) == square).count());
@@ -41,7 +41,7 @@ public class MarkerManager {
         marker.teleport(game.gameMap.getStartLocation(game.arena).add((double) x / 128, 0.0525f + marker.getTransformation().getScale().y * stacked, (double) y / 128));
     }
 
-    private int getSquare(int square) {
+    private static int getSquare(int square) {
         return square == 0 ? 100 : square;
     }
 }

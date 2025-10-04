@@ -73,4 +73,12 @@ public class GuiTools {
         stack.setItemMeta(meta);
         return stack;
     }
+
+    public static String getCardsText(int amount) {
+        if (amount == 1) {
+            return "card";
+        } else {
+            return "cards";
+        }
+    }
 }

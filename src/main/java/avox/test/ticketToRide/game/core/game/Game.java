@@ -116,9 +116,13 @@ public class Game {
         }
     }
 
+    public void broadcastTitle(Component title, Component subTitle) {
+        broadcastTitle(title, subTitle, null);
+    }
+
     public void broadcastTitle(Component title, Component subTitle, Player excludePlayer) {
         for (Player player : gamePlayers.keySet()) {
-            if (!player.equals(excludePlayer)) {
+            if (excludePlayer == null || !excludePlayer.equals(player)) {
                 player.showTitle(Title.title(title, subTitle));
             }
         }
@@ -130,7 +134,7 @@ public class Game {
 
         cardBoard[i] = colors.get(rand.nextInt(colors.size()));
         if (ensureValidBoard(colors, rand)) {
-            Component message = GuiTools.getGray("Card Board contained 3 or more train cards! Fully replaced!");
+            Component message = GuiTools.colorize("Card Board fully replaced! Contained three train cards!", NamedTextColor.GOLD);
             if (silent) {
                 return message;
             }
@@ -148,7 +152,7 @@ public class Game {
         }
 
         if (ensureValidBoard(colors, rand)) {
-            Component message = GuiTools.getGray("Card Board contained 3 or more train cards! Fully replaced!");
+            Component message = GuiTools.colorize("Card Board fully replaced! Contained three train cards!", NamedTextColor.GOLD);
             if (silent) {
                 return message;
             }

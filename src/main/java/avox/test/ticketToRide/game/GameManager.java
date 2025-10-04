@@ -36,17 +36,8 @@ public class GameManager {
                 return;
             }
 
-            new MapManager().generateAndDisplay(gameArena.world, gameMap.map, gameArena.mapStartPosition, gameMap.tilesX, gameMap.tilesY);
-            new BillboardManager().summonBillboards(gameArena);
-
-
-            // Testing
-//            TrainRenderer renderer = new TrainRenderer();
-//            for (Route route : gameMap.routes) {
-//                for (Route.Tile tile : route.tiles) {
-//                    renderer.spawnSmallTrainCar(gameArena, gameMap, tile);
-//                }
-//            }
+            MapManager.generateAndDisplay(gameArena.world, gameMap.map, gameArena.mapStartPosition, gameMap.tilesX, gameMap.tilesY);
+            BillboardManager.summonBillboards(gameArena);
 
             activeGames.add(new Game(gameOwner, gameArena, gameMap));
         } catch (Exception e) {
@@ -60,17 +51,16 @@ public class GameManager {
         game.gameHandler = new GameHandler(game);
         game.infoText.text(Component.empty());
 
-        MarkerManager markerManager = new MarkerManager();
         for (GamePlayer player : game.gamePlayers.values()) {
             player.player.getInventory().setBoots(setLeatherColor(new ItemStack(Material.LEATHER_BOOTS), player.markerData.color));
             player.player.getInventory().setLeggings(setLeatherColor(new ItemStack(Material.LEATHER_LEGGINGS), player.markerData.color));
             player.player.getInventory().setChestplate(setLeatherColor(new ItemStack(Material.LEATHER_CHESTPLATE), player.markerData.color));
             player.player.getInventory().setHelmet(setLeatherColor(new ItemStack(Material.LEATHER_HELMET), player.markerData.color));
 
-            player.marker = markerManager.spawnMarker(game, player.markerData.material);
+            player.marker = MarkerManager.spawnMarker(game, player.markerData.material);
             player.points = 0;
             player.trains = game.gameMap.startingTrains;
-            markerManager.reposition(game, player, player.points);
+            MarkerManager.reposition(game, player, player.points);
         }
     }
 

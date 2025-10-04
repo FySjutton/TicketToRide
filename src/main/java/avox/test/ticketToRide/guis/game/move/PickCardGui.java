@@ -50,8 +50,8 @@ public class PickCardGui extends InventoryGui {
             actionManager.setAction(gui, getBoardItem(game, color), 12 + i, GuiAction.ofClick(() -> {
                 if (pick(game, currentMove, player, new CardSelection(color, true), color.equals(game.gameMap.wildCard) ? 2 : 1)) {
                     Component message = game.newBoardCard(finalI, true);
-                    if (currentMove.finalMessage == null && message != null) {
-                        currentMove.finalMessage = message;
+                    if (message != null) {
+                        game.broadcast(message);
                     }
                     updateGui(game, player);
                 }
@@ -78,14 +78,11 @@ public class PickCardGui extends InventoryGui {
             currentMove.capacity -= space;
             currentMove.pickedColorCards.add(card);
             if (currentMove.capacity == 0) {
-                game.gameHandler.playerStateManager.get(player.player).finished = true;
                 for (CardSelection playerCard : currentMove.pickedColorCards) {
                     player.cards.merge(playerCard.card, 1, Integer::sum);
                 }
                 game.gameHandler.newCardMessage(player.player, currentMove.pickedColorCards.stream().collect(Collectors.toMap(s -> s.card, s -> 1, Integer::sum)), "You got:");
-                if (currentMove.finalMessage != null) {
-                    game.broadcast(currentMove.finalMessage);
-                }
+                game.gameHandler.playerStateManager.get(player.player).finished = true;
                 player.player.closeInventory();
             }
             return true;
