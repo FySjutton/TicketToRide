@@ -1,12 +1,14 @@
 package avox.test.ticketToRide.game;
 
 import avox.test.ticketToRide.game.core.City;
+import avox.test.ticketToRide.game.core.Route;
 import avox.test.ticketToRide.game.core.game.GameMap;
+import avox.test.ticketToRide.game.core.game.GamePlayer;
 
 import java.util.*;
 
 public class RewardCalculator {
-    private Map<City, List<Route>> buildGraph(GameMap gameMap) {
+    private static Map<City, List<Route>> buildGraph(GameMap gameMap) {
         List<Route> routes = gameMap.routes.stream().map(route -> new Route(route.point_a, route.point_b, route.length)).toList();
         Map<City, List<Route>> graph = new HashMap<>();
         for (City city : gameMap.allCities) graph.put(city, new ArrayList<>());
@@ -17,7 +19,7 @@ public class RewardCalculator {
         return graph;
     }
 
-    public int getReward(GameMap gameMap, City start, City goal) {
+    public static int getReward(GameMap gameMap, City start, City goal) {
         if (start == goal) return 0;
 
         Map<City, Integer> dist = new HashMap<>();
@@ -48,6 +50,43 @@ public class RewardCalculator {
         return scoreForLength(dist.get(goal), gameMap.mapPoints);
     }
 
+    public static int getLongestContinuousRoute(GamePlayer player) {
+        List<Route> routes = player.routes.stream().map(route -> new Route(route.point_a, route.point_b, route.length)).toList();
+        Map<City, List<Route>> graph = new HashMap<>();
+        for (Route r : routes) {
+            graph.computeIfAbsent(r.point_a, k -> new ArrayList<>()).add(r);
+            graph.computeIfAbsent(r.point_b, k -> new ArrayList<>()).add(r);
+        }
+
+        int longest = 0;
+
+        for (City start : graph.keySet()) {
+            longest = Math.max(longest, depthFirstSearch(start, new HashSet<>(), graph));
+        }
+
+        return longest;
+    }
+
+    private static int depthFirstSearch(City current, Set<Route> usedRoutes, Map<City, List<Route>> graph) {
+        int max = 0;
+
+        for (Route route : graph.getOrDefault(current, List.of())) {
+            if (usedRoutes.contains(route)) continue;
+
+            usedRoutes.add(route);
+
+            City next = (route.point_a.equals(current)) ? route.point_b : route.point_a;
+
+            int length = route.length + depthFirstSearch(next, usedRoutes, graph);
+            max = Math.max(max, length);
+
+            usedRoutes.remove(route);
+        }
+
+        return max;
+    }
+
+
     static class Route {
         public City point_a;
         public City point_b;
@@ -60,7 +99,7 @@ public class RewardCalculator {
         }
     }
 
-    private int scoreForLength(int length, ArrayList<GameMap.LengthPoints> mapPoints) {
+    private static int scoreForLength(int length, ArrayList<GameMap.LengthPoints> mapPoints) {
         for (GameMap.LengthPoints lengthPoint : mapPoints) {
             if (lengthPoint.matches(length)) {
                 return lengthPoint.points;

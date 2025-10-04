@@ -52,6 +52,10 @@ public class PlayerGuiManager implements Listener {
         }
     }
 
+    public static void clear() {
+        entries.clear();
+    }
+
     public record GuiInventory(Inventory inventory, boolean hotbarOnly) {}
 
     // --- Helper methods ---

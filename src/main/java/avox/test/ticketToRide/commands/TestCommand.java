@@ -75,8 +75,7 @@ public class TestCommand {
                             City b = map.getRandomCity(false);
 
                             System.out.println("heer");
-                            RewardCalculator rewardCalculator = new RewardCalculator();
-                            int reward = rewardCalculator.getReward(map, a, b);
+                            int reward = RewardCalculator.getReward(map, a, b);
 //                            pathFinder.test(map, sender);
 
                             sender.sendMessage("§e§l" + reward + "§r§afor A: §e" + a.name() + "§a, B: §e" + b.name());

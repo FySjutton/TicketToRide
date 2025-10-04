@@ -67,6 +67,7 @@ public class MoveManager {
         gameHandler.playerStateManager.put(player.player, new MoveAction(game, player, PlayerGuiManager.getGui(player.player).actionManager));
 
         gameHandler.timerManager.startTimedAction(120, () -> {
+            gameHandler.closeInventories();
             gameHandler.setDefaultHotbar(player);
             if (currentMove.onFinish != null) {
                 currentMove.onFinish.run();
@@ -114,6 +115,7 @@ public class MoveManager {
     }
 
     public void placeRoute(GamePlayer player) {
+        // Todo: Description in chat
         GameHandler.HotbarAction actionAction = player.hotbarAction;
         player.hotbarAction = new GameHandler.HotbarAction(GuiTools.getYellow("Return"), () -> {
             currentMove.placeModeSelected = false;
@@ -203,6 +205,7 @@ public class MoveManager {
         int points = game.gameMap.routePoints.get(card.route.length - 1);
         player.points += points;
         player.trains -= card.route.length;
+        player.routes.add(card.route);
         MarkerManager.reposition(game, player, player.points);
 
         String builtMessage;

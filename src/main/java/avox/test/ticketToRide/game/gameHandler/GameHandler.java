@@ -1,5 +1,9 @@
 package avox.test.ticketToRide.game.gameHandler;
 
+import avox.test.ticketToRide.TicketToRide;
+import avox.test.ticketToRide.game.Countdown;
+import avox.test.ticketToRide.game.RewardCalculator;
+import avox.test.ticketToRide.game.core.Route;
 import avox.test.ticketToRide.game.core.game.Game;
 import avox.test.ticketToRide.game.core.MapColor;
 import avox.test.ticketToRide.game.core.game.GamePlayer;
@@ -8,16 +12,20 @@ import avox.test.ticketToRide.guis.GuiAction;
 import avox.test.ticketToRide.util.GuiTools;
 import avox.test.ticketToRide.listener.PlayerGuiManager;
 import avox.test.ticketToRide.guis.game.ViewInfo;
+import avox.test.ticketToRide.util.LeaderboardMessage;
+import avox.test.ticketToRide.util.Waiter;
+import avox.test.ticketToRide.util.board.MarkerManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class GameHandler {
     public Game game;
@@ -30,23 +38,76 @@ public class GameHandler {
     public GameHandler(Game game) {
         this.game = game;
         Random rand = new Random();
+        new Countdown(TicketToRide.plugin, 10, (seconds) -> game.broadcastTitle(Component.text(seconds, Countdown.getColor(seconds)), Component.text("Game starting in...", NamedTextColor.YELLOW), 1.5f), () -> {
+            // Start by letting all players choose at least 2 cards
+            game.broadcastTitle(Component.text("Select Destination Cards", NamedTextColor.YELLOW), Component.text("Select at least 2", NamedTextColor.GRAY));
+            game.broadcast(Component.text("Select destination cards! You must keep at least 2.", NamedTextColor.YELLOW));
+            for (GamePlayer player : game.gamePlayers.values()) {
+                destinationHandler.chooseDestinationCards(game, player, 2);
+            }
+            timerManager.startTimedAction(120, () -> {
+                game.broadcast("§aAll players have finished choosing their routes.");
+                giveStartingCards(rand);
 
-        // Start by letting all players choose at least 2 cards
-        for (GamePlayer player : game.gamePlayers.values()) {
-            player.player.showTitle(Title.title(Component.text("Select Destination Cards"), Component.text("Select at least 2")));
-            destinationHandler.chooseDestinationCards(game, player, 2);
-        }
-        timerManager.startTimedAction(120, () -> {
-            game.broadcast("§aAll players have finished choosing their routes.");
-            giveStartingCards(rand);
-
-            // Initiate the move cycle
-            moveManager.startMove(game, game.gamePlayers.values().stream().toList().get(rand.nextInt(0, game.gamePlayers.size())));
-        });
+                // Initiate the move cycle
+                moveManager.startMove(game, game.gamePlayers.values().stream().toList().get(rand.nextInt(0, game.gamePlayers.size())));
+            });
+        }).start();
     }
 
     public void gameFinished() {
-        game.broadcastTitle(GuiTools.colorize("Game over!", NamedTextColor.GREEN), Component.empty());
+        playerStateManager.clear();
+        closeInventories();
+        PlayerGuiManager.clear();
+        game.broadcastTitle(GuiTools.colorize("Game over!", NamedTextColor.GREEN), Component.empty(), 2.5f);
+        new Waiter(TicketToRide.plugin).waitSeconds(2, () -> {
+            HashMap<GamePlayer, Integer> routeLengths = new HashMap<>();
+            for (GamePlayer player : game.gamePlayers.values()) {
+                routeLengths.put(player, RewardCalculator.getLongestContinuousRoute(player));
+            }
+            int longestRoute = Collections.max(routeLengths.values());
+            List<GamePlayer> longestWinners = routeLengths.keySet().stream().filter(player -> routeLengths.get(player) == longestRoute).toList();
+            for (GamePlayer player : longestWinners) {
+                player.points += 10;
+                MarkerManager.reposition(game, player, player.points);
+            }
+
+            String message;
+            String titleMessage;
+            if (longestWinners.size() == 1) {
+                GamePlayer winner = longestWinners.getFirst();
+                message = winner.player.getName() + " received 10 bonus points for having the longest continuous route!";
+                titleMessage = winner.player.getName();
+            } else {
+                String names = longestWinners.stream()
+                        .map(p -> p.player.getName())
+                        .collect(Collectors.joining(", "));
+                message = names + " each received 10 bonus points for tying for the longest continuous route!";
+                titleMessage = longestWinners.size() + " players";
+            }
+            game.broadcast(Component.text(message, NamedTextColor.GREEN));
+            game.broadcastTitle(Component.text(titleMessage + " wins the...", NamedTextColor.GREEN), Component.text("Longest continuous route price!", NamedTextColor.YELLOW), 3.5f);
+        }).waitSeconds(3, () -> game.broadcastTitle(Component.text("The winner is...", NamedTextColor.YELLOW), Component.empty(), 5)).waitSeconds( 4, () -> {
+            int mostPoints = Collections.max(game.gamePlayers.values().stream().map(p -> p.points).toList());
+            List<GamePlayer> winners = game.gamePlayers.values().stream().filter(player -> player.points == mostPoints).toList();
+            String message;
+            if (winners.size() == 1) {
+                GamePlayer winner = winners.getFirst();
+                message = winner.player.getName() + " won the game!";
+            } else {
+                String names = winners.stream()
+                        .map(p -> p.player.getName())
+                        .collect(Collectors.joining(", "));
+                message = names + " tied first place!";
+            }
+            game.broadcastTitle(Component.text(message, NamedTextColor.GREEN), Component.text("With a total of " + mostPoints + " points!", NamedTextColor.YELLOW), 5);
+            Component leaderboard = LeaderboardMessage.buildLeaderboard("Game Over - Result:", new ArrayList<>(game.gamePlayers.values().stream().map(player -> new LeaderboardMessage.Entry(player.player.getName(), player.points)).toList()));
+            game.broadcast(leaderboard);
+            for (GamePlayer player : game.gamePlayers.values()) {
+                player.hotbarAction = new HotbarAction(Component.text("Leave Game", NamedTextColor.RED), () -> game.leaveGame(player.player), 4, null);
+                setHotbar(player);
+            }
+        });
     }
 
     private void giveStartingCards(Random rand) {
@@ -103,6 +164,12 @@ public class GameHandler {
     public void clearHotbar(Player player) {
         for (int i = 0; i < 9; i++) {
             player.getInventory().setItem(i, null);
+        }
+    }
+
+    public void closeInventories() {
+        for (Player player : game.gamePlayers.keySet()) {
+            player.closeInventory();
         }
     }
 

@@ -3,8 +3,8 @@ package avox.test.ticketToRide.game.core.game;
 import avox.test.ticketToRide.TicketToRide;
 import avox.test.ticketToRide.game.core.DestinationCard;
 import avox.test.ticketToRide.game.core.MapColor;
+import avox.test.ticketToRide.game.core.Route;
 import avox.test.ticketToRide.game.gameHandler.GameHandler;
-import avox.test.ticketToRide.listener.PlayerGuiManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,7 +15,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 public class GamePlayer {
     public Player player;
@@ -24,6 +23,7 @@ public class GamePlayer {
     public MapColor markerData;
 
     public LinkedHashMap<MapColor, Integer> cards = new LinkedHashMap<>();
+    public ArrayList<Route> routes = new ArrayList<>();
     public int points = -1;
     public int trains;
 

@@ -26,7 +26,7 @@ public class DestinationCard {
             indexB = rand.nextInt(map.cities.size());
         } while (indexB == indexA);
 
-        int reward = new RewardCalculator().getReward(map, map.cities.get(indexA), map.cities.get(indexB));
+        int reward = RewardCalculator.getReward(map, map.cities.get(indexA), map.cities.get(indexB));
         return new DestinationCard(map.cities.get(indexA), map.cities.get(indexB), reward);
     }
 

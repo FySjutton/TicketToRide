@@ -14,6 +14,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 
+import java.time.Duration;
 import java.util.*;
 
 import static avox.test.ticketToRide.TicketToRide.playerStateManager;
@@ -117,13 +118,21 @@ public class Game {
     }
 
     public void broadcastTitle(Component title, Component subTitle) {
-        broadcastTitle(title, subTitle, null);
+        broadcastTitle(title, subTitle, null, -1);
+    }
+
+    public void broadcastTitle(Component title, Component subTitle, float timer) {
+        broadcastTitle(title, subTitle, null, timer);
     }
 
     public void broadcastTitle(Component title, Component subTitle, Player excludePlayer) {
+        broadcastTitle(title, subTitle, excludePlayer, -1);
+    }
+
+    public void broadcastTitle(Component title, Component subTitle, Player excludePlayer, float timer) {
         for (Player player : gamePlayers.keySet()) {
             if (excludePlayer == null || !excludePlayer.equals(player)) {
-                player.showTitle(Title.title(title, subTitle));
+                player.showTitle(Title.title(title, subTitle, timer != -1 ? Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO) : Title.DEFAULT_TIMES));
             }
         }
     }

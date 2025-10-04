@@ -50,7 +50,7 @@ public class GameMap {
         this.tilesY = tilesY;
         this.pointBoardSize = pointBoardSize;
         this.startingTrains = startingTrains;
-        this.startingTrains = 20; // TODO: Remove this test line
+        this.startingTrains = 10; // TODO: Remove this test line
         this.headTexture = headTexture;
         this.wildCard = wildCard;
     }
